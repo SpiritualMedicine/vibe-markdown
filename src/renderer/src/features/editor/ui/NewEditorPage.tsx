@@ -42,6 +42,27 @@ export default function NewEditorPage(): React.JSX.Element {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [commands])
 
+  useEffect(() => {
+    const workspace = workspaceRef.current
+    if (!workspace) {
+      return
+    }
+
+    const observer = new ResizeObserver(() => {
+      setEditorPaneWidth((current) => {
+        if (current === null) {
+          return current
+        }
+        const workspaceWidth = workspace.getBoundingClientRect().width
+        const maxEditorWidth = Math.max(MIN_PANE_WIDTH, workspaceWidth - MIN_PANE_WIDTH)
+        return Math.min(maxEditorWidth, Math.max(MIN_PANE_WIDTH, current))
+      })
+    })
+    observer.observe(workspace)
+
+    return () => observer.disconnect()
+  }, [])
+
   const onStartResize = useCallback((event: ReactPointerEvent<HTMLDivElement>): void => {
     const workspace = workspaceRef.current
     if (!workspace) {

@@ -1,4 +1,5 @@
 import { type PointerEvent as ReactPointerEvent, useCallback, useRef, useState } from 'react'
+import { useEffect } from 'react'
 
 interface EditorWorkspaceProps {
   content: string
@@ -11,6 +12,27 @@ export function EditorWorkspace(props: EditorWorkspaceProps): React.JSX.Element 
   const workspaceRef = useRef<HTMLElement | null>(null)
   const [editorPaneWidth, setEditorPaneWidth] = useState<number | null>(null)
   const MIN_PANE_WIDTH = 280
+
+  useEffect(() => {
+    const workspace = workspaceRef.current
+    if (!workspace) {
+      return
+    }
+
+    const observer = new ResizeObserver(() => {
+      setEditorPaneWidth((current) => {
+        if (current === null) {
+          return current
+        }
+        const workspaceWidth = workspace.getBoundingClientRect().width
+        const maxEditorWidth = Math.max(MIN_PANE_WIDTH, workspaceWidth - MIN_PANE_WIDTH)
+        return Math.min(maxEditorWidth, Math.max(MIN_PANE_WIDTH, current))
+      })
+    })
+    observer.observe(workspace)
+
+    return () => observer.disconnect()
+  }, [])
 
   const onStartResize = useCallback((event: ReactPointerEvent<HTMLDivElement>): void => {
     const workspace = workspaceRef.current

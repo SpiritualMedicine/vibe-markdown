@@ -431,7 +431,7 @@ body {
   gap: 0;
   padding: 0;
   min-height: 0;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .panel {
@@ -468,7 +468,7 @@ body {
 
 .editor-input-panel,
 .editor-preview-panel {
-  min-width: 320px;
+  min-width: 0;
   max-width: 80vw;
 }
 
