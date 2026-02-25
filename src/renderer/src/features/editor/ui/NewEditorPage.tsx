@@ -154,7 +154,6 @@ export default function NewEditorPage(): React.JSX.Element {
   return (
     <div className="editor-shell">
       <EditorToolbar
-        autoSaveEnabled={state.ui.autoSaveEnabled}
         canSave={state.document.isDirty}
         isBusy={state.ui.isBusy}
         isMaximized={state.ui.isWindowMaximized}
@@ -167,13 +166,10 @@ export default function NewEditorPage(): React.JSX.Element {
         onNew={() => void commands.newDoc()}
         onOpen={() => void commands.openDoc()}
         onOpenFolder={() => void commands.openFolder()}
-        onOpenRecent={(filePath) => void commands.openFromPath(filePath)}
         onSave={() => void commands.saveDoc()}
         onSaveAs={() => void commands.saveAs()}
         onThemeChange={(theme) => void commands.setTheme(theme)}
-        onToggleAutoSave={(enabled) => void commands.toggleAutoSave(enabled)}
         onToggleMaximize={() => void commands.toggleMaximizeWindow()}
-        recentFiles={state.workspace.recentFiles}
       />
 
       <div className="editor-body" ref={bodyRef}>
@@ -186,14 +182,34 @@ export default function NewEditorPage(): React.JSX.Element {
           locale={state.ui.locale}
           onOpenFile={(filePath) => void commands.openFromPath(filePath)}
           onOpenFolder={() => void commands.openFolder()}
+          onOpenRecent={(filePath) => void commands.openFromPath(filePath)}
+          recentFiles={state.workspace.recentFiles}
           style={directoryPaneWidth === null ? undefined : { width: `${directoryPaneWidth}px` }}
         />
         <div className="sidebar-resizer" onPointerDown={onStartDirectoryResize} role="separator" />
 
         <div className="editor-main">
           <div className="editor-meta">
-            <span className="file-name">{title}</span>
-            <span className={`status status-${state.ui.status.tone}`}>{state.ui.status.message}</span>
+            <div className="editor-meta-left">
+              <span className="file-name">{title}</span>
+              <span className={`status status-${state.ui.status.tone}`}>{state.ui.status.message}</span>
+            </div>
+            <label
+              className="autosave-switch"
+              title={`${t(state.ui.locale, 'toolbar.autoSave')}: ${state.ui.autoSaveEnabled ? 'ON' : 'OFF'}`}
+            >
+              <input
+                aria-label={t(state.ui.locale, 'toolbar.autoSave')}
+                checked={state.ui.autoSaveEnabled}
+                className="autosave-switch-input"
+                onChange={(event) => void commands.toggleAutoSave(event.target.checked)}
+                type="checkbox"
+              />
+              <span aria-hidden="true" className="autosave-switch-track">
+                <span className="autosave-switch-thumb" />
+              </span>
+              <span className="autosave-switch-label">{t(state.ui.locale, 'toolbar.autoSave')}</span>
+            </label>
           </div>
 
           <main className="editor-workspace" ref={workspaceRef}>

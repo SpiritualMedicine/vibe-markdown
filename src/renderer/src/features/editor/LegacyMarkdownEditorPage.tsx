@@ -83,7 +83,6 @@ export default function LegacyMarkdownEditorPage(): React.JSX.Element {
   return (
     <div className="editor-shell">
       <EditorToolbar
-        autoSaveEnabled={editor.autoSaveEnabled}
         canSave={editor.document.isDirty}
         isBusy={editor.isBusy}
         isMaximized={isMaximized}
@@ -95,17 +94,14 @@ export default function LegacyMarkdownEditorPage(): React.JSX.Element {
         onNew={editor.createNew}
         onOpen={() => void editor.openDocument()}
         onOpenFolder={() => void editor.openDirectory()}
-        onOpenRecent={(filePath) => void editor.openRecentDocument(filePath)}
         onSave={() => void editor.saveDocument()}
         onSaveAs={() => void editor.saveAsDocument()}
         onLocaleChange={setLocale}
         onThemeChange={setTheme}
-        onToggleAutoSave={editor.setAutoSaveEnabled}
         onToggleMaximize={async () => {
           await window.api.app.toggleMaximizeWindow()
           await refreshMaximizedState()
         }}
-        recentFiles={editor.recentFiles}
       />
 
       <div className="editor-body">
@@ -118,11 +114,31 @@ export default function LegacyMarkdownEditorPage(): React.JSX.Element {
           locale={locale}
           onOpenFile={(filePath) => void editor.openRecentDocument(filePath)}
           onOpenFolder={() => void editor.openDirectory()}
+          onOpenRecent={(filePath) => void editor.openRecentDocument(filePath)}
+          recentFiles={editor.recentFiles}
         />
         <div className="editor-main">
           <div className="editor-meta">
-            <span className="file-name">{title}</span>
-            <span className={`status status-${editor.status.tone}`}>{editor.status.message}</span>
+            <div className="editor-meta-left">
+              <span className="file-name">{title}</span>
+              <span className={`status status-${editor.status.tone}`}>{editor.status.message}</span>
+            </div>
+            <label
+              className="autosave-switch"
+              title={`${t(locale, 'toolbar.autoSave')}: ${editor.autoSaveEnabled ? 'ON' : 'OFF'}`}
+            >
+              <input
+                aria-label={t(locale, 'toolbar.autoSave')}
+                checked={editor.autoSaveEnabled}
+                className="autosave-switch-input"
+                onChange={(event) => editor.setAutoSaveEnabled(event.target.checked)}
+                type="checkbox"
+              />
+              <span aria-hidden="true" className="autosave-switch-track">
+                <span className="autosave-switch-thumb" />
+              </span>
+              <span className="autosave-switch-label">{t(locale, 'toolbar.autoSave')}</span>
+            </label>
           </div>
           <EditorWorkspace
             content={editor.document.content}

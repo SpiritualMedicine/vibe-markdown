@@ -1,4 +1,4 @@
-import { EditorLocale, LOCALE_OPTIONS, t } from '../locale'
+import { EditorLocale, t } from '../locale'
 import { EditorThemeId, THEME_OPTIONS } from '../theme'
 
 interface EditorToolbarProps {
@@ -7,12 +7,8 @@ interface EditorToolbarProps {
   isMaximized: boolean
   locale: EditorLocale
   theme: EditorThemeId
-  recentFiles: string[]
-  autoSaveEnabled: boolean
   onLocaleChange: (locale: EditorLocale) => void
   onThemeChange: (theme: EditorThemeId) => void
-  onToggleAutoSave: (enabled: boolean) => void
-  onOpenRecent: (filePath: string) => void
   onNew: () => void
   onOpen: () => void
   onOpenFolder: () => void
@@ -31,12 +27,8 @@ export function EditorToolbar(props: EditorToolbarProps): React.JSX.Element {
     isMaximized,
     locale,
     theme,
-    recentFiles,
-    autoSaveEnabled,
     onLocaleChange,
     onThemeChange,
-    onToggleAutoSave,
-    onOpenRecent,
     onNew,
     onOpen,
     onOpenFolder,
@@ -106,35 +98,6 @@ export function EditorToolbar(props: EditorToolbarProps): React.JSX.Element {
           <span aria-hidden="true" className="action-icon action-icon-export" />
         </button>
         <select
-          className="recent-select"
-          disabled={isBusy || recentFiles.length === 0}
-          defaultValue=""
-          onChange={(event) => {
-            const value = event.target.value
-            if (!value) {
-              return
-            }
-            onOpenRecent(value)
-            event.target.value = ''
-          }}
-        >
-          <option value="">{t(locale, 'toolbar.recentFiles')}</option>
-          {recentFiles.map((filePath) => (
-            <option key={filePath} value={filePath}>
-              {filePath}
-            </option>
-          ))}
-        </select>
-        <label className="autosave-toggle">
-          <input
-            checked={autoSaveEnabled}
-            disabled={isBusy}
-            onChange={(event) => onToggleAutoSave(event.target.checked)}
-            type="checkbox"
-          />
-          {t(locale, 'toolbar.autoSave')}
-        </label>
-        <select
           aria-label={t(locale, 'toolbar.theme')}
           className="theme-select"
           disabled={isBusy}
@@ -147,19 +110,22 @@ export function EditorToolbar(props: EditorToolbarProps): React.JSX.Element {
             </option>
           ))}
         </select>
-        <select
-          aria-label={t(locale, 'toolbar.language')}
-          className="language-select"
-          disabled={isBusy}
-          onChange={(event) => onLocaleChange(event.target.value as EditorLocale)}
-          value={locale}
-        >
-          {LOCALE_OPTIONS.map((option) => (
-            <option key={option.id} value={option.id}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <label className="locale-switch" title={t(locale, 'toolbar.language')}>
+          <input
+            aria-label={t(locale, 'toolbar.language')}
+            checked={locale === 'en-US'}
+            className="locale-switch-input"
+            disabled={isBusy}
+            onChange={(event) => onLocaleChange(event.target.checked ? 'en-US' : 'zh-CN')}
+            type="checkbox"
+          />
+          <span aria-hidden="true" className="locale-switch-track">
+            <span className="locale-switch-thumb" />
+          </span>
+          <span aria-hidden="true" className="locale-switch-text">
+            {locale === 'en-US' ? 'EN' : '中'}
+          </span>
+        </label>
       </div>
       <div className="window-controls">
         <button

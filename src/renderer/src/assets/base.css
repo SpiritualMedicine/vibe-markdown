@@ -139,3 +139,22 @@ body {
   border: 3px solid transparent;
   background-clip: content-box;
 }
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+:root.theme-transition-active::view-transition-new(root) {
+  animation: theme-circle-reveal 460ms ease-out both;
+}
+
+@keyframes theme-circle-reveal {
+  from {
+    clip-path: circle(0 at var(--theme-transition-x, 50vw) var(--theme-transition-y, 50vh));
+  }
+
+  to {
+    clip-path: circle(var(--theme-transition-radius, 150vmax) at var(--theme-transition-x, 50vw) var(--theme-transition-y, 50vh));
+  }
+}

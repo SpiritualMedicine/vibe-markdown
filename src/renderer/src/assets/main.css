@@ -254,29 +254,83 @@ body {
     box-shadow 120ms ease;
 }
 
-.recent-select:disabled {
-  opacity: 0.5;
-}
-
-.autosave-toggle {
+.locale-switch {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  height: 34px;
+  padding: 0 8px;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--surface-strong);
   color: var(--ink);
-  height: 34px;
-  padding: 0 10px;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
   transition:
     border-color 120ms ease,
     box-shadow 120ms ease;
 }
 
-.autosave-toggle input {
-  accent-color: var(--accent);
+.locale-switch-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.locale-switch-track {
+  width: 30px;
+  height: 18px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 84%, #fff);
+  padding: 2px;
+  display: inline-flex;
+  align-items: center;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.locale-switch-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--surface-strong);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.22);
+  transition: transform 160ms ease;
+}
+
+.locale-switch-input:checked + .locale-switch-track {
+  background: color-mix(in srgb, var(--accent) 58%, #fff);
+  border-color: color-mix(in srgb, var(--accent) 78%, #fff);
+}
+
+.locale-switch-input:checked + .locale-switch-track .locale-switch-thumb {
+  transform: translateX(12px);
+}
+
+.locale-switch-input:focus-visible + .locale-switch-track {
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.locale-switch:hover {
+  border-color: var(--accent);
+}
+
+.locale-switch-text {
+  min-width: 20px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.locale-switch:has(.locale-switch-input:disabled) {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.recent-select:disabled {
+  opacity: 0.5;
 }
 
 .window-controls {
@@ -413,7 +467,6 @@ body {
 .recent-select:focus-visible,
 .theme-select:focus-visible,
 .language-select:focus-visible,
-.autosave-toggle:focus-within,
 .editor-textarea:focus-visible {
   outline: none;
   border-color: var(--accent);
@@ -442,6 +495,92 @@ body {
   background: color-mix(in srgb, var(--surface-strong) 86%, transparent);
   backdrop-filter: blur(10px);
   box-shadow: 0 6px 22px rgba(159, 18, 57, 0.12);
+}
+
+.editor-meta-left {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.autosave-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+}
+
+.autosave-switch-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.autosave-switch-track {
+  width: 34px;
+  height: 20px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 84%, #fff);
+  padding: 2px;
+  display: inline-flex;
+  align-items: center;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.autosave-switch-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--surface-strong);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.22);
+  transition: transform 160ms ease;
+}
+
+.autosave-switch-input:checked + .autosave-switch-track {
+  background: color-mix(in srgb, var(--accent) 58%, #fff);
+  border-color: color-mix(in srgb, var(--accent) 78%, #fff);
+}
+
+.autosave-switch-input:checked + .autosave-switch-track .autosave-switch-thumb {
+  transform: translateX(14px);
+}
+
+.autosave-switch-input:focus-visible + .autosave-switch-track {
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.autosave-switch:hover .autosave-switch-track {
+  border-color: var(--accent);
+}
+
+.autosave-switch-label {
+  color: var(--muted);
+  margin-left: 0;
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition:
+    max-width 180ms ease,
+    opacity 140ms ease,
+    margin-left 180ms ease;
+}
+
+.autosave-switch:hover .autosave-switch-label,
+.autosave-switch:focus-within .autosave-switch-label {
+  margin-left: 8px;
+  max-width: 120px;
+  opacity: 1;
 }
 
 .file-name {
@@ -607,7 +746,7 @@ body.is-resizing {
 .explorer-content {
   min-height: 0;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr);
   padding: 10px;
   gap: 10px;
 }
@@ -624,10 +763,16 @@ body.is-resizing {
   text-overflow: ellipsis;
 }
 
+.explorer-recent-select {
+  width: 100%;
+  min-width: 0;
+}
+
 .explorer-tree {
   list-style: none;
   margin: 0;
   padding-left: 0;
+  min-height: 0;
   overflow: auto;
 }
 
@@ -650,7 +795,7 @@ body.is-resizing {
 }
 
 .explorer-directory > summary:hover {
-  background: #fff1f2;
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface-strong));
 }
 
 .explorer-directory > .explorer-tree {
@@ -671,12 +816,12 @@ body.is-resizing {
 }
 
 .explorer-file:hover {
-  background: #fff1f2;
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface-strong));
 }
 
 .explorer-file.is-active {
-  background: #ffe4e6;
-  color: #9f1239;
+  background: color-mix(in srgb, var(--accent) 22%, var(--surface-strong));
+  color: var(--accent);
   font-weight: 600;
 }
 

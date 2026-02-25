@@ -7,10 +7,12 @@ interface FileExplorerProps {
   locale: EditorLocale
   directoryPath: string | null
   directoryEntries: DirectoryTreeEntry[]
+  recentFiles: string[]
   currentFilePath: string | null
   isBusy: boolean
   onOpenFolder: () => void
   onOpenFile: (filePath: string) => void
+  onOpenRecent: (filePath: string) => void
 }
 
 interface TreeNodeProps {
@@ -56,7 +58,19 @@ function TreeNode(props: TreeNodeProps): React.JSX.Element {
 }
 
 export function FileExplorer(props: FileExplorerProps): React.JSX.Element {
-  const { className, style, locale, directoryPath, directoryEntries, currentFilePath, isBusy, onOpenFolder, onOpenFile } = props
+  const {
+    className,
+    style,
+    locale,
+    directoryPath,
+    directoryEntries,
+    recentFiles,
+    currentFilePath,
+    isBusy,
+    onOpenFolder,
+    onOpenFile,
+    onOpenRecent
+  } = props
   return (
     <section className={`panel explorer-panel ${className ?? ''}`.trim()} style={style}>
       <div className="panel-label explorer-header">
@@ -67,6 +81,26 @@ export function FileExplorer(props: FileExplorerProps): React.JSX.Element {
       </div>
       <div className="explorer-content">
         <div className="explorer-path">{directoryPath ?? t(locale, 'directory.noFolder')}</div>
+        <select
+          className="recent-select explorer-recent-select"
+          disabled={isBusy || recentFiles.length === 0}
+          defaultValue=""
+          onChange={(event) => {
+            const value = event.target.value
+            if (!value) {
+              return
+            }
+            onOpenRecent(value)
+            event.target.value = ''
+          }}
+        >
+          <option value="">{t(locale, 'toolbar.recentFiles')}</option>
+          {recentFiles.map((filePath) => (
+            <option key={filePath} value={filePath}>
+              {filePath}
+            </option>
+          ))}
+        </select>
         {directoryEntries.length > 0 ? (
           <ul className="explorer-tree">
             {directoryEntries.map((entry) => (
