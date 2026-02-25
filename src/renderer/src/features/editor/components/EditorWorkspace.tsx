@@ -4,11 +4,13 @@ import { useEffect } from 'react'
 interface EditorWorkspaceProps {
   content: string
   previewHtml: string
+  markdownTitle?: string
+  previewTitle?: string
   onChange: (value: string) => void
 }
 
 export function EditorWorkspace(props: EditorWorkspaceProps): React.JSX.Element {
-  const { content, previewHtml, onChange } = props
+  const { content, previewHtml, markdownTitle = 'Markdown', previewTitle = 'Preview', onChange } = props
   const workspaceRef = useRef<HTMLElement | null>(null)
   const [editorPaneWidth, setEditorPaneWidth] = useState<number | null>(null)
   const MIN_PANE_WIDTH = 280
@@ -73,7 +75,7 @@ export function EditorWorkspace(props: EditorWorkspaceProps): React.JSX.Element 
         className="panel editor-input-panel"
         style={editorPaneWidth === null ? undefined : { width: `${editorPaneWidth}px` }}
       >
-        <div className="panel-label">Markdown</div>
+        <div className="panel-label">{markdownTitle}</div>
         <textarea
           className="editor-textarea"
           value={content}
@@ -83,7 +85,7 @@ export function EditorWorkspace(props: EditorWorkspaceProps): React.JSX.Element 
       </section>
       <div className="editor-resizer" onPointerDown={onStartResize} role="separator" />
       <section className="panel editor-preview-panel">
-        <div className="panel-label">Preview</div>
+        <div className="panel-label">{previewTitle}</div>
         <article className="preview-content" dangerouslySetInnerHTML={{ __html: previewHtml }} />
       </section>
     </main>

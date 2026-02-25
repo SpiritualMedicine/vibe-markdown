@@ -10,6 +10,8 @@ import {
   restoreLaunchFile,
   saveAs,
   saveDoc,
+  setLocale,
+  setTheme,
   setEditorHtml,
   setEditorMarkdown,
   toggleAutoSave,
@@ -18,8 +20,17 @@ import {
 import { EditorAction, EditorCommandContext, EditorState } from '../application/commands/types'
 import { htmlToMarkdown, markdownToHtml } from '../core/editor/markdownCodec'
 import { createDesktopClient } from '../infra/desktop/desktopClient'
+import {
+  applyEditorLocale,
+  EditorLocale,
+  loadEditorLocale,
+  saveEditorLocale,
+  t as translate
+} from '../features/editor/locale'
+import { applyEditorTheme, EditorThemeId, loadEditorTheme, saveEditorTheme } from '../features/editor/theme'
 
 const initialMarkdown = '# Welcome\n\nStart writing your markdown document.'
+const initialLocale = loadEditorLocale()
 
 const initialState: EditorState = {
   document: {
@@ -37,9 +48,11 @@ const initialState: EditorState = {
     isBusy: false,
     isDirectoryBusy: false,
     autoSaveEnabled: true,
+    locale: initialLocale,
     isWindowMaximized: false,
     showPreview: true,
-    status: { tone: 'idle', message: 'Ready' }
+    theme: 'rose',
+    status: { tone: 'idle', message: translate(initialLocale, 'status.ready') }
   }
 }
 
@@ -57,6 +70,10 @@ function reducer(state: EditorState, action: EditorAction): EditorState {
       return { ...state, workspace: { ...state.workspace, ...action.payload } }
     case 'SET_AUTO_SAVE':
       return { ...state, ui: { ...state.ui, autoSaveEnabled: action.payload } }
+    case 'SET_LOCALE':
+      return { ...state, ui: { ...state.ui, locale: action.payload } }
+    case 'SET_THEME':
+      return { ...state, ui: { ...state.ui, theme: action.payload } }
     case 'SET_WINDOW_MAXIMIZED':
       return { ...state, ui: { ...state.ui, isWindowMaximized: action.payload } }
     case 'SET_SHOW_PREVIEW':
@@ -77,9 +94,11 @@ interface EditorStoreValue {
     saveAs: () => Promise<void>
     exportHtml: () => Promise<void>
     toggleAutoSave: (enabled: boolean) => Promise<void>
+    setLocale: (locale: EditorLocale) => Promise<void>
     togglePreview: () => Promise<void>
     setEditorHtml: (html: string) => Promise<void>
     setEditorMarkdown: (markdown: string) => Promise<void>
+    setTheme: (theme: EditorThemeId) => Promise<void>
     minimizeWindow: () => Promise<void>
     toggleMaximizeWindow: () => Promise<void>
     closeWindow: () => Promise<void>
@@ -102,7 +121,8 @@ export function EditorStoreProvider({ children }: { children: React.ReactNode })
       dispatch,
       getState: () => stateRef.current,
       markdownToHtml,
-      htmlToMarkdown
+      htmlToMarkdown,
+      t: (key, vars) => translate(stateRef.current.ui.locale, key, vars)
     }),
     [desktop]
   )
@@ -122,10 +142,12 @@ export function EditorStoreProvider({ children }: { children: React.ReactNode })
       saveAs: () => run(saveAs),
       exportHtml: () => run(exportHtml),
       toggleAutoSave: (enabled: boolean) => run((commandCtx) => toggleAutoSave(commandCtx, enabled)),
+      setLocale: (locale: EditorLocale) => run((commandCtx) => setLocale(commandCtx, locale)),
       togglePreview: () => run(togglePreview),
       setEditorHtml: (html: string) => run((commandCtx) => setEditorHtml(commandCtx, html)),
       setEditorMarkdown: (markdown: string) =>
         run((commandCtx) => setEditorMarkdown(commandCtx, markdown)),
+      setTheme: (theme: EditorThemeId) => run((commandCtx) => setTheme(commandCtx, theme)),
       minimizeWindow: () => desktop.app.minimizeWindow(),
       toggleMaximizeWindow: async () => {
         await desktop.app.toggleMaximizeWindow()
@@ -141,11 +163,23 @@ export function EditorStoreProvider({ children }: { children: React.ReactNode })
     void run(refreshRecentList)
     void run(refreshWindowMaximized)
     void run(restoreLaunchFile)
+    dispatch({ type: 'SET_THEME', payload: loadEditorTheme() })
+    dispatch({ type: 'SET_LOCALE', payload: initialLocale })
   }, [run])
 
   useEffect(() => {
     desktop.app.setDirtyState(state.document.isDirty)
   }, [desktop, state.document.isDirty])
+
+  useEffect(() => {
+    applyEditorTheme(state.ui.theme)
+    saveEditorTheme(state.ui.theme)
+  }, [state.ui.theme])
+
+  useEffect(() => {
+    applyEditorLocale(state.ui.locale)
+    saveEditorLocale(state.ui.locale)
+  }, [state.ui.locale])
 
   useEffect(() => {
     if (!state.ui.autoSaveEnabled || !state.document.filePath || !state.document.isDirty) {

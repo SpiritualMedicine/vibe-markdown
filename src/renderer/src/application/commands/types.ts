@@ -1,6 +1,8 @@
 import type React from 'react'
 import type { DirectoryTreeEntry } from '../../../../shared/editor-ipc'
 import type { DesktopClient } from '../../infra/desktop/desktopClient'
+import type { EditorLocale, LocaleKey } from '../../features/editor/locale'
+import type { EditorThemeId } from '../../features/editor/theme'
 
 export interface EditorStatus {
   tone: 'idle' | 'success' | 'error'
@@ -23,8 +25,10 @@ export interface EditorState {
     isBusy: boolean
     isDirectoryBusy: boolean
     autoSaveEnabled: boolean
+    locale: EditorLocale
     isWindowMaximized: boolean
     showPreview: boolean
+    theme: EditorThemeId
     status: EditorStatus
   }
 }
@@ -39,6 +43,8 @@ export type EditorAction =
       payload: Partial<EditorState['workspace']>
     }
   | { type: 'SET_AUTO_SAVE'; payload: boolean }
+  | { type: 'SET_LOCALE'; payload: EditorLocale }
+  | { type: 'SET_THEME'; payload: EditorThemeId }
   | { type: 'SET_WINDOW_MAXIMIZED'; payload: boolean }
   | { type: 'SET_SHOW_PREVIEW'; payload: boolean }
 
@@ -48,6 +54,7 @@ export interface EditorCommandContext {
   dispatch: React.Dispatch<EditorAction>
   markdownToHtml: (markdown: string) => string
   htmlToMarkdown: (html: string) => string
+  t: (key: LocaleKey, vars?: Record<string, string | number>) => string
 }
 
 export type EditorCommand<Payload = void> = Payload extends void

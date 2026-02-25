@@ -1,7 +1,10 @@
 import { DirectoryTreeEntry } from '../../../../../shared/editor-ipc'
+import { EditorLocale, t } from '../locale'
 
 interface FileExplorerProps {
   className?: string
+  style?: React.CSSProperties
+  locale: EditorLocale
   directoryPath: string | null
   directoryEntries: DirectoryTreeEntry[]
   currentFilePath: string | null
@@ -53,17 +56,17 @@ function TreeNode(props: TreeNodeProps): React.JSX.Element {
 }
 
 export function FileExplorer(props: FileExplorerProps): React.JSX.Element {
-  const { className, directoryPath, directoryEntries, currentFilePath, isBusy, onOpenFolder, onOpenFile } = props
+  const { className, style, locale, directoryPath, directoryEntries, currentFilePath, isBusy, onOpenFolder, onOpenFile } = props
   return (
-    <section className={`panel explorer-panel ${className ?? ''}`.trim()}>
+    <section className={`panel explorer-panel ${className ?? ''}`.trim()} style={style}>
       <div className="panel-label explorer-header">
-        <span>Directory</span>
+        <span>{t(locale, 'panel.directory')}</span>
         <button disabled={isBusy} onClick={onOpenFolder} type="button">
-          {directoryPath ? 'Change' : 'Open'}
+          {directoryPath ? t(locale, 'directory.change') : t(locale, 'directory.open')}
         </button>
       </div>
       <div className="explorer-content">
-        <div className="explorer-path">{directoryPath ?? 'No folder selected'}</div>
+        <div className="explorer-path">{directoryPath ?? t(locale, 'directory.noFolder')}</div>
         {directoryEntries.length > 0 ? (
           <ul className="explorer-tree">
             {directoryEntries.map((entry) => (
@@ -76,7 +79,7 @@ export function FileExplorer(props: FileExplorerProps): React.JSX.Element {
             ))}
           </ul>
         ) : (
-          <div className="explorer-empty">No markdown files found.</div>
+          <div className="explorer-empty">{t(locale, 'directory.empty')}</div>
         )}
       </div>
     </section>

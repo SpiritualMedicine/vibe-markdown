@@ -4,6 +4,8 @@ import { renderMarkdown } from '../../shared/markdown/renderMarkdown'
 import { FileExplorer } from './components/FileExplorer'
 import { EditorToolbar } from './components/EditorToolbar'
 import { EditorWorkspace } from './components/EditorWorkspace'
+import { applyEditorLocale, EditorLocale, loadEditorLocale, saveEditorLocale, t } from './locale'
+import { applyEditorTheme, EditorThemeId, loadEditorTheme, saveEditorTheme } from './theme'
 
 function basename(filePath: string | null): string {
   if (!filePath) {
@@ -28,6 +30,8 @@ function buildExportHtml(title: string, body: string): string {
 export default function LegacyMarkdownEditorPage(): React.JSX.Element {
   const editor = useLegacyEditorFacade()
   const [isMaximized, setIsMaximized] = useState(false)
+  const [theme, setTheme] = useState<EditorThemeId>('rose')
+  const [locale, setLocale] = useState<EditorLocale>('zh-CN')
   const previewHtml = useMemo(() => renderMarkdown(editor.document.content), [editor.document.content])
   const fileName = basename(editor.document.filePath)
   const title = `${fileName}${editor.document.isDirty ? ' *' : ''}`
@@ -40,7 +44,19 @@ export default function LegacyMarkdownEditorPage(): React.JSX.Element {
   useEffect(() => {
     void editor.restoreLastSession()
     void refreshMaximizedState()
+    setTheme(loadEditorTheme())
+    setLocale(loadEditorLocale())
   }, [editor, refreshMaximizedState])
+
+  useEffect(() => {
+    applyEditorTheme(theme)
+    saveEditorTheme(theme)
+  }, [theme])
+
+  useEffect(() => {
+    applyEditorLocale(locale)
+    saveEditorLocale(locale)
+  }, [locale])
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
@@ -71,6 +87,8 @@ export default function LegacyMarkdownEditorPage(): React.JSX.Element {
         canSave={editor.document.isDirty}
         isBusy={editor.isBusy}
         isMaximized={isMaximized}
+        locale={locale}
+        theme={theme}
         onClose={() => void window.api.app.closeWindow()}
         onExportHtml={() => void editor.exportHtmlDocument(buildExportHtml(fileName, previewHtml))}
         onMinimize={() => void window.api.app.minimizeWindow()}
@@ -80,6 +98,8 @@ export default function LegacyMarkdownEditorPage(): React.JSX.Element {
         onOpenRecent={(filePath) => void editor.openRecentDocument(filePath)}
         onSave={() => void editor.saveDocument()}
         onSaveAs={() => void editor.saveAsDocument()}
+        onLocaleChange={setLocale}
+        onThemeChange={setTheme}
         onToggleAutoSave={editor.setAutoSaveEnabled}
         onToggleMaximize={async () => {
           await window.api.app.toggleMaximizeWindow()
@@ -95,6 +115,7 @@ export default function LegacyMarkdownEditorPage(): React.JSX.Element {
           directoryEntries={editor.directoryEntries}
           directoryPath={editor.directoryPath}
           isBusy={editor.isDirectoryBusy}
+          locale={locale}
           onOpenFile={(filePath) => void editor.openRecentDocument(filePath)}
           onOpenFolder={() => void editor.openDirectory()}
         />
@@ -106,6 +127,8 @@ export default function LegacyMarkdownEditorPage(): React.JSX.Element {
           <EditorWorkspace
             content={editor.document.content}
             onChange={editor.updateContent}
+            previewTitle={t(locale, 'panel.preview')}
+            markdownTitle={t(locale, 'panel.markdown')}
             previewHtml={previewHtml}
           />
         </div>

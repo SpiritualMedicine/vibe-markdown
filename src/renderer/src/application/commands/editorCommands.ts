@@ -1,5 +1,7 @@
 import type { OpenByPathRequest } from '../../../../shared/editor-ipc'
+import type { EditorLocale } from '../../features/editor/locale'
 import type { EditorCommandContext } from './types'
+import type { EditorThemeId } from '../../features/editor/theme'
 
 function confirmDiscardIfDirty(ctx: EditorCommandContext, message: string): boolean {
   if (!ctx.getState().document.isDirty) {
@@ -9,7 +11,7 @@ function confirmDiscardIfDirty(ctx: EditorCommandContext, message: string): bool
 }
 
 export async function newDoc(ctx: EditorCommandContext): Promise<void> {
-  if (!confirmDiscardIfDirty(ctx, 'Discard unsaved changes?')) {
+  if (!confirmDiscardIfDirty(ctx, ctx.t('dialog.discardUnsaved'))) {
     return
   }
   const markdown = '# Welcome\n\nStart writing your markdown document.'
@@ -22,11 +24,11 @@ export async function newDoc(ctx: EditorCommandContext): Promise<void> {
       isDirty: false
     }
   })
-  ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'success', message: 'New document created' } })
+  ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'success', message: ctx.t('status.newCreated') } })
 }
 
 export async function openDoc(ctx: EditorCommandContext): Promise<void> {
-  if (!confirmDiscardIfDirty(ctx, 'Discard unsaved changes and open another file?')) {
+  if (!confirmDiscardIfDirty(ctx, ctx.t('dialog.discardOpenOther'))) {
     return
   }
   ctx.dispatch({ type: 'SET_BUSY', payload: true })
@@ -34,7 +36,7 @@ export async function openDoc(ctx: EditorCommandContext): Promise<void> {
   ctx.dispatch({ type: 'SET_BUSY', payload: false })
 
   if (result.canceled) {
-    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: 'Open canceled' } })
+    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: ctx.t('status.openCanceled') } })
     return
   }
   if (result.error) {
@@ -54,7 +56,7 @@ export async function openDoc(ctx: EditorCommandContext): Promise<void> {
   })
   ctx.dispatch({
     type: 'SET_STATUS',
-    payload: { tone: 'success', message: `Opened ${result.filePath ?? 'document'}` }
+    payload: { tone: 'success', message: ctx.t('status.opened', { target: result.filePath ?? 'document' }) }
   })
 }
 
@@ -64,7 +66,7 @@ export async function openFromPath(
 ): Promise<void> {
   if (
     !request.skipDirtyGuard &&
-    !confirmDiscardIfDirty(ctx, 'Discard unsaved changes and open another file?')
+    !confirmDiscardIfDirty(ctx, ctx.t('dialog.discardOpenOther'))
   ) {
     return
   }
@@ -93,7 +95,7 @@ export async function openFromPath(
   })
   ctx.dispatch({
     type: 'SET_STATUS',
-    payload: { tone: 'success', message: `Opened ${result.filePath ?? 'document'}` }
+    payload: { tone: 'success', message: ctx.t('status.opened', { target: result.filePath ?? 'document' }) }
   })
 }
 
@@ -103,7 +105,7 @@ export async function openFolder(ctx: EditorCommandContext): Promise<void> {
   ctx.dispatch({ type: 'SET_DIRECTORY_BUSY', payload: false })
 
   if (result.canceled) {
-    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: 'Open folder canceled' } })
+    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: ctx.t('status.openFolderCanceled') } })
     return
   }
   if (result.error) {
@@ -120,7 +122,7 @@ export async function openFolder(ctx: EditorCommandContext): Promise<void> {
   })
   ctx.dispatch({
     type: 'SET_STATUS',
-    payload: { tone: 'success', message: `Loaded folder ${result.directoryPath ?? ''}` }
+    payload: { tone: 'success', message: ctx.t('status.loadedFolder', { target: result.directoryPath ?? '' }) }
   })
 }
 
@@ -140,7 +142,7 @@ export async function saveDoc(ctx: EditorCommandContext): Promise<void> {
   ctx.dispatch({ type: 'SET_BUSY', payload: false })
 
   if (result.canceled) {
-    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: 'Save canceled' } })
+    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: ctx.t('status.saveCanceled') } })
     return
   }
   if (result.error) {
@@ -154,7 +156,7 @@ export async function saveDoc(ctx: EditorCommandContext): Promise<void> {
   })
   ctx.dispatch({
     type: 'SET_STATUS',
-    payload: { tone: 'success', message: `Saved ${result.filePath ?? 'document'}` }
+    payload: { tone: 'success', message: ctx.t('status.saved', { target: result.filePath ?? 'document' }) }
   })
 }
 
@@ -169,7 +171,7 @@ export async function saveAs(ctx: EditorCommandContext): Promise<void> {
   ctx.dispatch({ type: 'SET_BUSY', payload: false })
 
   if (result.canceled) {
-    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: 'Save as canceled' } })
+    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: ctx.t('status.saveAsCanceled') } })
     return
   }
   if (result.error) {
@@ -183,7 +185,7 @@ export async function saveAs(ctx: EditorCommandContext): Promise<void> {
   })
   ctx.dispatch({
     type: 'SET_STATUS',
-    payload: { tone: 'success', message: `Saved as ${result.filePath ?? 'document'}` }
+    payload: { tone: 'success', message: ctx.t('status.savedAs', { target: result.filePath ?? 'document' }) }
   })
 }
 
@@ -199,7 +201,7 @@ export async function exportHtml(ctx: EditorCommandContext): Promise<void> {
   ctx.dispatch({ type: 'SET_BUSY', payload: false })
 
   if (result.canceled) {
-    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: 'Export canceled' } })
+    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: ctx.t('status.exportCanceled') } })
     return
   }
   if (result.error) {
@@ -208,12 +210,20 @@ export async function exportHtml(ctx: EditorCommandContext): Promise<void> {
   }
   ctx.dispatch({
     type: 'SET_STATUS',
-    payload: { tone: 'success', message: `Exported ${result.filePath ?? 'HTML file'}` }
+    payload: { tone: 'success', message: ctx.t('status.exported', { target: result.filePath ?? 'HTML file' }) }
   })
 }
 
 export async function toggleAutoSave(ctx: EditorCommandContext, enabled: boolean): Promise<void> {
   ctx.dispatch({ type: 'SET_AUTO_SAVE', payload: enabled })
+}
+
+export async function setLocale(ctx: EditorCommandContext, locale: EditorLocale): Promise<void> {
+  ctx.dispatch({ type: 'SET_LOCALE', payload: locale })
+}
+
+export async function setTheme(ctx: EditorCommandContext, theme: EditorThemeId): Promise<void> {
+  ctx.dispatch({ type: 'SET_THEME', payload: theme })
 }
 
 export async function togglePreview(ctx: EditorCommandContext): Promise<void> {
@@ -229,7 +239,7 @@ export async function setEditorHtml(ctx: EditorCommandContext, html: string): Pr
       isDirty: true
     }
   })
-  ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: 'Editing...' } })
+  ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: ctx.t('status.editing') } })
 }
 
 export async function setEditorMarkdown(ctx: EditorCommandContext, markdown: string): Promise<void> {
@@ -241,7 +251,7 @@ export async function setEditorMarkdown(ctx: EditorCommandContext, markdown: str
       isDirty: true
     }
   })
-  ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: 'Editing...' } })
+  ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: ctx.t('status.editing') } })
 }
 
 export async function restoreLaunchFile(ctx: EditorCommandContext): Promise<void> {
