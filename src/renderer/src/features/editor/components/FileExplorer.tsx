@@ -1,6 +1,7 @@
 import { DirectoryTreeEntry } from '../../../../../shared/editor-ipc'
 
 interface FileExplorerProps {
+  className?: string
   directoryPath: string | null
   directoryEntries: DirectoryTreeEntry[]
   currentFilePath: string | null
@@ -52,9 +53,9 @@ function TreeNode(props: TreeNodeProps): React.JSX.Element {
 }
 
 export function FileExplorer(props: FileExplorerProps): React.JSX.Element {
-  const { directoryPath, directoryEntries, currentFilePath, isBusy, onOpenFolder, onOpenFile } = props
+  const { className, directoryPath, directoryEntries, currentFilePath, isBusy, onOpenFolder, onOpenFile } = props
   return (
-    <section className="panel explorer-panel">
+    <section className={`panel explorer-panel ${className ?? ''}`.trim()}>
       <div className="panel-label explorer-header">
         <span>Directory</span>
         <button disabled={isBusy} onClick={onOpenFolder} type="button">
