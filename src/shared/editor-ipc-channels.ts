@@ -1,0 +1,23 @@
+export const IPC_CHANNELS = {
+  fileOpen: 'editor:file-open',
+  folderOpen: 'editor:folder-open',
+  folderOpenByPath: 'editor:folder-open-by-path',
+  folderRecentList: 'editor:folder-recent-list',
+  folderPinnedList: 'editor:folder-pinned-list',
+  folderPin: 'editor:folder-pin',
+  folderUnpin: 'editor:folder-unpin',
+  folderSearch: 'editor:folder-search',
+  folderBacklinks: 'editor:folder-backlinks',
+  fileSave: 'editor:file-save',
+  fileSaveAs: 'editor:file-save-as',
+  fileOpenByPath: 'editor:file-open-by-path',
+  fileRecentList: 'editor:file-recent-list',
+  imageImport: 'editor:image-import',
+  exportHtml: 'editor:export-html',
+  appSetDirtyState: 'editor:app-set-dirty-state',
+  appLaunchState: 'editor:app-launch-state',
+  windowMinimize: 'editor:window-minimize',
+  windowToggleMaximize: 'editor:window-toggle-maximize',
+  windowClose: 'editor:window-close',
+  windowIsMaximized: 'editor:window-is-maximized'
+} as const

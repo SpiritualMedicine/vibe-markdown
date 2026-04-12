@@ -1,5 +1,5 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-import { DesktopApi } from '../shared/editor-ipc'
+import type { DesktopApi } from '../shared'
 
 declare global {
   interface Window {

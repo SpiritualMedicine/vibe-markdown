@@ -1,29 +1,43 @@
 import type React from 'react'
-import type { DirectoryTreeEntry } from '../../../../shared/editor-ipc'
+import type {
+  DirectorySearchResult,
+  DirectoryTreeEntry,
+  DocumentBacklink
+} from '../../../../shared'
 import type { DesktopClient } from '../../infra/desktop/desktopClient'
-import type { EditorLocale, LocaleKey } from '../../features/editor/locale'
-import type { EditorThemeId } from '../../features/editor/theme'
+import type { EditorLocale, EditorThemeId, LocaleKey } from '../../features/editor/settings'
 
 export interface EditorStatus {
   tone: 'idle' | 'success' | 'error'
   message: string
 }
 
+export interface EditorTab {
+  id: string
+  filePath: string | null
+  markdown: string
+  html: string
+  isDirty: boolean
+}
+
 export interface EditorState {
-  document: {
-    filePath: string | null
-    markdown: string
-    html: string
-    isDirty: boolean
-  }
+  tabs: EditorTab[]
+  activeTabId: string
   workspace: {
     recentFiles: string[]
+    recentFolders: string[]
+    pinnedFolders: string[]
     directoryPath: string | null
     directoryEntries: DirectoryTreeEntry[]
+    searchQuery: string
+    searchResults: DirectorySearchResult[]
+    backlinks: DocumentBacklink[]
   }
   ui: {
     isBusy: boolean
     isDirectoryBusy: boolean
+    isSearchBusy: boolean
+    isBacklinksBusy: boolean
     autoSaveEnabled: boolean
     locale: EditorLocale
     isWindowMaximized: boolean
@@ -36,12 +50,12 @@ export interface EditorState {
 export type EditorAction =
   | { type: 'SET_BUSY'; payload: boolean }
   | { type: 'SET_DIRECTORY_BUSY'; payload: boolean }
+  | { type: 'SET_SEARCH_BUSY'; payload: boolean }
+  | { type: 'SET_BACKLINKS_BUSY'; payload: boolean }
   | { type: 'SET_STATUS'; payload: EditorStatus }
-  | { type: 'SET_DOCUMENT'; payload: Partial<EditorState['document']> }
-  | {
-      type: 'SET_WORKSPACE'
-      payload: Partial<EditorState['workspace']>
-    }
+  | { type: 'SET_TABS'; payload: EditorTab[] }
+  | { type: 'SET_ACTIVE_TAB'; payload: string }
+  | { type: 'SET_WORKSPACE'; payload: Partial<EditorState['workspace']> }
   | { type: 'SET_AUTO_SAVE'; payload: boolean }
   | { type: 'SET_LOCALE'; payload: EditorLocale }
   | { type: 'SET_THEME'; payload: EditorThemeId }

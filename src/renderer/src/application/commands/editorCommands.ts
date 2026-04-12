@@ -1,268 +1,37 @@
-import type { OpenByPathRequest } from '../../../../shared/editor-ipc'
-import type { EditorLocale } from '../../features/editor/locale'
-import type { EditorCommandContext } from './types'
-import type { EditorThemeId } from '../../features/editor/theme'
+export {
+  exportHtml,
+  importImageAtSelection,
+  newDoc,
+  newDocFromTemplate,
+  openDoc,
+  openFromPath,
+  restoreLaunchFile,
+  saveAs,
+  saveDoc,
+  setEditorHtml,
+  setEditorMarkdown
+} from './documentCommands'
 
-function confirmDiscardIfDirty(ctx: EditorCommandContext, message: string): boolean {
-  if (!ctx.getState().document.isDirty) {
-    return true
-  }
-  return window.confirm(message)
-}
+export {
+  activateTab,
+  closeOtherTabs,
+  closeTab,
+  closeTabsToRight,
+  openFolder,
+  openFolderFromPath,
+  loadBacklinks,
+  refreshFolderLists,
+  refreshRecentList,
+  reorderTabs,
+  runDirectorySearch,
+  togglePinnedFolder
+} from './workspaceCommands'
 
-export async function newDoc(ctx: EditorCommandContext): Promise<void> {
-  if (!confirmDiscardIfDirty(ctx, ctx.t('dialog.discardUnsaved'))) {
-    return
-  }
-  const markdown = '# Welcome\n\nStart writing your markdown document.'
-  ctx.dispatch({
-    type: 'SET_DOCUMENT',
-    payload: {
-      filePath: null,
-      markdown,
-      html: ctx.markdownToHtml(markdown),
-      isDirty: false
-    }
-  })
-  ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'success', message: ctx.t('status.newCreated') } })
-}
-
-export async function openDoc(ctx: EditorCommandContext): Promise<void> {
-  if (!confirmDiscardIfDirty(ctx, ctx.t('dialog.discardOpenOther'))) {
-    return
-  }
-  ctx.dispatch({ type: 'SET_BUSY', payload: true })
-  const result = await ctx.desktop.file.open()
-  ctx.dispatch({ type: 'SET_BUSY', payload: false })
-
-  if (result.canceled) {
-    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: ctx.t('status.openCanceled') } })
-    return
-  }
-  if (result.error) {
-    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'error', message: result.error } })
-    return
-  }
-
-  const markdown = result.content
-  ctx.dispatch({
-    type: 'SET_DOCUMENT',
-    payload: {
-      filePath: result.filePath,
-      markdown,
-      html: ctx.markdownToHtml(markdown),
-      isDirty: false
-    }
-  })
-  ctx.dispatch({
-    type: 'SET_STATUS',
-    payload: { tone: 'success', message: ctx.t('status.opened', { target: result.filePath ?? 'document' }) }
-  })
-}
-
-export async function openFromPath(
-  ctx: EditorCommandContext,
-  request: OpenByPathRequest & { skipDirtyGuard?: boolean }
-): Promise<void> {
-  if (
-    !request.skipDirtyGuard &&
-    !confirmDiscardIfDirty(ctx, ctx.t('dialog.discardOpenOther'))
-  ) {
-    return
-  }
-
-  ctx.dispatch({ type: 'SET_BUSY', payload: true })
-  const result = await ctx.desktop.file.openByPath({ filePath: request.filePath })
-  ctx.dispatch({ type: 'SET_BUSY', payload: false })
-
-  if (result.error) {
-    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'error', message: result.error } })
-    return
-  }
-  if (result.canceled) {
-    return
-  }
-
-  const markdown = result.content
-  ctx.dispatch({
-    type: 'SET_DOCUMENT',
-    payload: {
-      filePath: result.filePath,
-      markdown,
-      html: ctx.markdownToHtml(markdown),
-      isDirty: false
-    }
-  })
-  ctx.dispatch({
-    type: 'SET_STATUS',
-    payload: { tone: 'success', message: ctx.t('status.opened', { target: result.filePath ?? 'document' }) }
-  })
-}
-
-export async function openFolder(ctx: EditorCommandContext): Promise<void> {
-  ctx.dispatch({ type: 'SET_DIRECTORY_BUSY', payload: true })
-  const result = await ctx.desktop.file.openDirectory()
-  ctx.dispatch({ type: 'SET_DIRECTORY_BUSY', payload: false })
-
-  if (result.canceled) {
-    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: ctx.t('status.openFolderCanceled') } })
-    return
-  }
-  if (result.error) {
-    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'error', message: result.error } })
-    return
-  }
-
-  ctx.dispatch({
-    type: 'SET_WORKSPACE',
-    payload: {
-      directoryPath: result.directoryPath,
-      directoryEntries: result.entries
-    }
-  })
-  ctx.dispatch({
-    type: 'SET_STATUS',
-    payload: { tone: 'success', message: ctx.t('status.loadedFolder', { target: result.directoryPath ?? '' }) }
-  })
-}
-
-export async function refreshRecentList(ctx: EditorCommandContext): Promise<void> {
-  const recentFiles = await ctx.desktop.file.recentList()
-  ctx.dispatch({ type: 'SET_WORKSPACE', payload: { recentFiles } })
-}
-
-export async function saveDoc(ctx: EditorCommandContext): Promise<void> {
-  const state = ctx.getState()
-  ctx.dispatch({ type: 'SET_BUSY', payload: true })
-  const markdown = state.document.markdown
-  const result = await ctx.desktop.file.save({
-    filePath: state.document.filePath,
-    content: markdown
-  })
-  ctx.dispatch({ type: 'SET_BUSY', payload: false })
-
-  if (result.canceled) {
-    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: ctx.t('status.saveCanceled') } })
-    return
-  }
-  if (result.error) {
-    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'error', message: result.error } })
-    return
-  }
-
-  ctx.dispatch({
-    type: 'SET_DOCUMENT',
-    payload: { filePath: result.filePath, markdown, isDirty: false }
-  })
-  ctx.dispatch({
-    type: 'SET_STATUS',
-    payload: { tone: 'success', message: ctx.t('status.saved', { target: result.filePath ?? 'document' }) }
-  })
-}
-
-export async function saveAs(ctx: EditorCommandContext): Promise<void> {
-  const state = ctx.getState()
-  ctx.dispatch({ type: 'SET_BUSY', payload: true })
-  const markdown = state.document.markdown
-  const result = await ctx.desktop.file.saveAs({
-    filePath: state.document.filePath,
-    content: markdown
-  })
-  ctx.dispatch({ type: 'SET_BUSY', payload: false })
-
-  if (result.canceled) {
-    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: ctx.t('status.saveAsCanceled') } })
-    return
-  }
-  if (result.error) {
-    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'error', message: result.error } })
-    return
-  }
-
-  ctx.dispatch({
-    type: 'SET_DOCUMENT',
-    payload: { filePath: result.filePath, markdown, isDirty: false }
-  })
-  ctx.dispatch({
-    type: 'SET_STATUS',
-    payload: { tone: 'success', message: ctx.t('status.savedAs', { target: result.filePath ?? 'document' }) }
-  })
-}
-
-export async function exportHtml(ctx: EditorCommandContext): Promise<void> {
-  const state = ctx.getState()
-  const fileName = state.document.filePath?.split(/[\\/]/).pop() ?? 'untitled.md'
-  const suggestedName = fileName.replace(/\.(md|markdown|txt)$/i, '') || 'untitled'
-  ctx.dispatch({ type: 'SET_BUSY', payload: true })
-  const result = await ctx.desktop.file.exportHtml({
-    suggestedName,
-    html: state.document.html
-  })
-  ctx.dispatch({ type: 'SET_BUSY', payload: false })
-
-  if (result.canceled) {
-    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: ctx.t('status.exportCanceled') } })
-    return
-  }
-  if (result.error) {
-    ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'error', message: result.error } })
-    return
-  }
-  ctx.dispatch({
-    type: 'SET_STATUS',
-    payload: { tone: 'success', message: ctx.t('status.exported', { target: result.filePath ?? 'HTML file' }) }
-  })
-}
-
-export async function toggleAutoSave(ctx: EditorCommandContext, enabled: boolean): Promise<void> {
-  ctx.dispatch({ type: 'SET_AUTO_SAVE', payload: enabled })
-}
-
-export async function setLocale(ctx: EditorCommandContext, locale: EditorLocale): Promise<void> {
-  ctx.dispatch({ type: 'SET_LOCALE', payload: locale })
-}
-
-export async function setTheme(ctx: EditorCommandContext, theme: EditorThemeId): Promise<void> {
-  ctx.dispatch({ type: 'SET_THEME', payload: theme })
-}
-
-export async function togglePreview(ctx: EditorCommandContext): Promise<void> {
-  const next = !ctx.getState().ui.showPreview
-  ctx.dispatch({ type: 'SET_SHOW_PREVIEW', payload: next })
-}
-
-export async function setEditorHtml(ctx: EditorCommandContext, html: string): Promise<void> {
-  ctx.dispatch({
-    type: 'SET_DOCUMENT',
-    payload: {
-      html,
-      isDirty: true
-    }
-  })
-  ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: ctx.t('status.editing') } })
-}
-
-export async function setEditorMarkdown(ctx: EditorCommandContext, markdown: string): Promise<void> {
-  ctx.dispatch({
-    type: 'SET_DOCUMENT',
-    payload: {
-      markdown,
-      html: ctx.markdownToHtml(markdown),
-      isDirty: true
-    }
-  })
-  ctx.dispatch({ type: 'SET_STATUS', payload: { tone: 'idle', message: ctx.t('status.editing') } })
-}
-
-export async function restoreLaunchFile(ctx: EditorCommandContext): Promise<void> {
-  const launchState = await ctx.desktop.app.getLaunchState()
-  if (!launchState.lastOpenedFilePath) {
-    return
-  }
-  await openFromPath(ctx, { filePath: launchState.lastOpenedFilePath, skipDirtyGuard: true })
-}
-
-export async function refreshWindowMaximized(ctx: EditorCommandContext): Promise<void> {
-  const isWindowMaximized = await ctx.desktop.app.isWindowMaximized()
-  ctx.dispatch({ type: 'SET_WINDOW_MAXIMIZED', payload: isWindowMaximized })
-}
+export {
+  refreshWindowMaximized,
+  setLocale,
+  setTheme,
+  showStatus,
+  toggleAutoSave,
+  togglePreview
+} from './uiCommands'

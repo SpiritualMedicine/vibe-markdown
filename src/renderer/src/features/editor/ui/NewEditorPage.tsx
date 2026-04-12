@@ -1,235 +1,179 @@
-import { type PointerEvent as ReactPointerEvent, useCallback, useEffect, useRef, useState } from 'react'
-import { EditorToolbar } from '../components/EditorToolbar'
-import { FileExplorer } from '../components/FileExplorer'
-import { t } from '../locale'
+import {
+  BacklinksPanel,
+  EditorMarkdownPanel,
+  EditorPreviewPanel,
+  EditorStatusBar,
+  EditorTabBar,
+  EditorToolbar,
+  FileExplorer,
+  OutlinePanel
+} from '../components'
+import { t } from '../settings'
 import { useEditorStore } from '../../../state/editorStore'
-
-function basename(filePath: string | null): string {
-  if (!filePath) {
-    return 'untitled.md'
-  }
-  const segments = filePath.split(/[\\/]/)
-  return segments[segments.length - 1] || 'untitled.md'
-}
+import { useEditorPageController } from './useEditorPageController'
 
 export default function NewEditorPage(): React.JSX.Element {
   const { state, commands } = useEditorStore()
-  const bodyRef = useRef<HTMLDivElement | null>(null)
-  const workspaceRef = useRef<HTMLElement | null>(null)
-  const [directoryPaneWidth, setDirectoryPaneWidth] = useState<number | null>(null)
-  const [editorPaneWidth, setEditorPaneWidth] = useState<number | null>(null)
-  const fileName = basename(state.document.filePath)
-  const title = `${fileName}${state.document.isDirty ? ' *' : ''}`
-  const MIN_PANE_WIDTH = 280
-  const MIN_DIRECTORY_WIDTH = 200
-  const MIN_MAIN_WIDTH = 620
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent): void => {
-      if (!(event.ctrlKey || event.metaKey)) {
-        return
-      }
-      const key = event.key.toLowerCase()
-      if (key === 's') {
-        event.preventDefault()
-        void commands.saveDoc()
-      } else if (key === 'o') {
-        event.preventDefault()
-        void commands.openDoc()
-      } else if (key === 'n') {
-        event.preventDefault()
-        void commands.newDoc()
-      }
-    }
-
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [commands])
-
-  useEffect(() => {
-    const body = bodyRef.current
-    if (!body) {
-      return
-    }
-
-    const observer = new ResizeObserver(() => {
-      setDirectoryPaneWidth((current) => {
-        if (current === null) {
-          return current
-        }
-        const bodyWidth = body.getBoundingClientRect().width
-        const maxDirectoryWidth = Math.max(MIN_DIRECTORY_WIDTH, bodyWidth - MIN_MAIN_WIDTH)
-        return Math.min(maxDirectoryWidth, Math.max(MIN_DIRECTORY_WIDTH, current))
-      })
-    })
-    observer.observe(body)
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    const workspace = workspaceRef.current
-    if (!workspace) {
-      return
-    }
-
-    const observer = new ResizeObserver(() => {
-      setEditorPaneWidth((current) => {
-        if (current === null) {
-          return current
-        }
-        const workspaceWidth = workspace.getBoundingClientRect().width
-        const maxEditorWidth = Math.max(MIN_PANE_WIDTH, workspaceWidth - MIN_PANE_WIDTH)
-        return Math.min(maxEditorWidth, Math.max(MIN_PANE_WIDTH, current))
-      })
-    })
-    observer.observe(workspace)
-    return () => observer.disconnect()
-  }, [])
-
-  const onStartDirectoryResize = useCallback((event: ReactPointerEvent<HTMLDivElement>): void => {
-    const body = bodyRef.current
-    if (!body) {
-      return
-    }
-    const explorer = body.querySelector<HTMLElement>('.explorer-sidebar')
-    if (!explorer) {
-      return
-    }
-
-    const startX = event.clientX
-    const startWidth = directoryPaneWidth ?? explorer.getBoundingClientRect().width
-    const bodyWidth = body.getBoundingClientRect().width
-    const maxDirectoryWidth = Math.max(MIN_DIRECTORY_WIDTH, bodyWidth - MIN_MAIN_WIDTH)
-
-    const onPointerMove = (moveEvent: PointerEvent): void => {
-      const deltaX = moveEvent.clientX - startX
-      const nextWidth = Math.min(maxDirectoryWidth, Math.max(MIN_DIRECTORY_WIDTH, startWidth + deltaX))
-      setDirectoryPaneWidth(nextWidth)
-    }
-
-    const onPointerUp = (): void => {
-      window.removeEventListener('pointermove', onPointerMove)
-      window.removeEventListener('pointerup', onPointerUp)
-      document.body.classList.remove('is-resizing')
-    }
-
-    document.body.classList.add('is-resizing')
-    window.addEventListener('pointermove', onPointerMove)
-    window.addEventListener('pointerup', onPointerUp)
-  }, [directoryPaneWidth])
-
-  const onStartResize = useCallback((event: ReactPointerEvent<HTMLDivElement>): void => {
-    const workspace = workspaceRef.current
-    if (!workspace) {
-      return
-    }
-    const panels = workspace.querySelectorAll<HTMLElement>('.editor-input-panel, .editor-preview-panel')
-    const editorPanel = panels[0]
-    if (!editorPanel) {
-      return
-    }
-
-    const startX = event.clientX
-    const startWidth = editorPaneWidth ?? editorPanel.getBoundingClientRect().width
-    const workspaceWidth = workspace.getBoundingClientRect().width
-    const maxEditorWidth = Math.max(MIN_PANE_WIDTH, workspaceWidth - MIN_PANE_WIDTH)
-
-    const onPointerMove = (moveEvent: PointerEvent): void => {
-      const deltaX = moveEvent.clientX - startX
-      const nextWidth = Math.min(maxEditorWidth, Math.max(MIN_PANE_WIDTH, startWidth + deltaX))
-      setEditorPaneWidth(nextWidth)
-    }
-
-    const onPointerUp = (): void => {
-      window.removeEventListener('pointermove', onPointerMove)
-      window.removeEventListener('pointerup', onPointerUp)
-      document.body.classList.remove('is-resizing')
-    }
-
-    document.body.classList.add('is-resizing')
-    window.addEventListener('pointermove', onPointerMove)
-    window.addEventListener('pointerup', onPointerUp)
-  }, [editorPaneWidth])
+  const {
+    activeSearchResultKey,
+    activeTab,
+    bodyRef,
+    directoryPaneWidth,
+    editorPaneWidth,
+    draggingTabId,
+    focusHeading,
+    handleDropImage,
+    handleInsertImage,
+    handleOpenBacklink,
+    handleOpenDocumentReference,
+    handleOpenFolder,
+    handleOpenFolderFromPath,
+    handleOpenSearchResult,
+    handleSearchKeyDown,
+    handleTabDrop,
+    isImageDropActive,
+    onStartDirectoryResize,
+    onStartEditorResize,
+    outline,
+    previewRef,
+    searchInput,
+    setDraggingTabId,
+    setIsImageDropActive,
+    setSearchInput,
+    setTabMenu,
+    tabMenu,
+    textareaRef,
+    title,
+    workspaceRef
+  } = useEditorPageController({ state, commands })
 
   return (
     <div className="editor-shell">
       <EditorToolbar
-        canSave={state.document.isDirty}
+        canSave={Boolean(activeTab?.isDirty)}
         isBusy={state.ui.isBusy}
         isMaximized={state.ui.isWindowMaximized}
         locale={state.ui.locale}
-        theme={state.ui.theme}
         onClose={() => void commands.closeWindow()}
         onExportHtml={() => void commands.exportHtml()}
+        onInsertImage={handleInsertImage}
         onLocaleChange={(locale) => void commands.setLocale(locale)}
         onMinimize={() => void commands.minimizeWindow()}
         onNew={() => void commands.newDoc()}
+        onNewFromTemplate={(templateId) => void commands.newDocFromTemplate(templateId)}
         onOpen={() => void commands.openDoc()}
         onOpenFolder={() => void commands.openFolder()}
         onSave={() => void commands.saveDoc()}
         onSaveAs={() => void commands.saveAs()}
         onThemeChange={(theme) => void commands.setTheme(theme)}
         onToggleMaximize={() => void commands.toggleMaximizeWindow()}
+        onTogglePreview={() => void commands.togglePreview()}
+        showPreview={state.ui.showPreview}
+        theme={state.ui.theme}
       />
 
       <div className="editor-body" ref={bodyRef}>
         <FileExplorer
           className="explorer-sidebar"
-          currentFilePath={state.document.filePath}
+          currentFilePath={activeTab?.filePath ?? null}
           directoryEntries={state.workspace.directoryEntries}
           directoryPath={state.workspace.directoryPath}
           isBusy={state.ui.isDirectoryBusy}
+          isSearchBusy={state.ui.isSearchBusy}
           locale={state.ui.locale}
           onOpenFile={(filePath) => void commands.openFromPath(filePath)}
-          onOpenFolder={() => void commands.openFolder()}
+          onOpenFolder={() => void handleOpenFolder()}
+          onOpenFolderFromPath={(directoryPath) => void handleOpenFolderFromPath(directoryPath)}
           onOpenRecent={(filePath) => void commands.openFromPath(filePath)}
+          onOpenSearchResult={(result) => void handleOpenSearchResult(result)}
+          onSearchChange={setSearchInput}
+          onSearchKeyDown={handleSearchKeyDown}
+          onTogglePinFolder={(directoryPath) => void commands.togglePinnedFolder(directoryPath)}
+          pinnedFolders={state.workspace.pinnedFolders}
+          activeSearchResultKey={activeSearchResultKey}
           recentFiles={state.workspace.recentFiles}
+          recentFolders={state.workspace.recentFolders}
+          searchQuery={searchInput}
+          searchResults={state.workspace.searchResults}
           style={directoryPaneWidth === null ? undefined : { width: `${directoryPaneWidth}px` }}
         />
         <div className="sidebar-resizer" onPointerDown={onStartDirectoryResize} role="separator" />
 
         <div className="editor-main">
-          <div className="editor-meta">
-            <div className="editor-meta-left">
-              <span className="file-name">{title}</span>
-              <span className={`status status-${state.ui.status.tone}`}>{state.ui.status.message}</span>
-            </div>
-            <label
-              className="autosave-switch"
-              title={`${t(state.ui.locale, 'toolbar.autoSave')}: ${state.ui.autoSaveEnabled ? 'ON' : 'OFF'}`}
-            >
-              <input
-                aria-label={t(state.ui.locale, 'toolbar.autoSave')}
-                checked={state.ui.autoSaveEnabled}
-                className="autosave-switch-input"
-                onChange={(event) => void commands.toggleAutoSave(event.target.checked)}
-                type="checkbox"
-              />
-              <span aria-hidden="true" className="autosave-switch-track">
-                <span className="autosave-switch-thumb" />
-              </span>
-              <span className="autosave-switch-label">{t(state.ui.locale, 'toolbar.autoSave')}</span>
-            </label>
-          </div>
+          <EditorTabBar
+            activeTabId={state.activeTabId}
+            draggingTabId={draggingTabId}
+            locale={state.ui.locale}
+            onActivateTab={(tabId) => void commands.activateTab(tabId)}
+            onCloseOtherTabs={(tabId) => void commands.closeOtherTabs(tabId)}
+            onCloseTab={(tabId) => void commands.closeTab(tabId)}
+            onCloseTabMenu={() => setTabMenu(null)}
+            onCloseTabsToRight={(tabId) => void commands.closeTabsToRight(tabId)}
+            onCreateTab={() => void commands.newDoc()}
+            onDragEnd={() => setDraggingTabId(null)}
+            onDragStart={(tabId, event) => {
+              setDraggingTabId(tabId)
+              event.dataTransfer.effectAllowed = 'move'
+              event.dataTransfer.setData('text/plain', tabId)
+            }}
+            onDropTab={handleTabDrop}
+            onOpenTabMenu={(tabId, x, y) => setTabMenu({ tabId, x, y })}
+            tabMenu={tabMenu}
+            tabs={state.tabs}
+          />
+
+          <EditorStatusBar
+            autoSaveEnabled={state.ui.autoSaveEnabled}
+            locale={state.ui.locale}
+            onToggleAutoSave={(enabled) => void commands.toggleAutoSave(enabled)}
+            statusMessage={state.ui.status.message}
+            statusTone={state.ui.status.tone}
+            title={title}
+          />
 
           <main className="editor-workspace" ref={workspaceRef}>
-            <section
-              className="panel editor-input-panel"
-              style={editorPaneWidth === null ? undefined : { width: `${editorPaneWidth}px` }}
-            >
-              <div className="panel-label">{t(state.ui.locale, 'panel.markdown')}</div>
-              <textarea
-                className="editor-textarea"
-                onChange={(event) => void commands.setEditorMarkdown(event.target.value)}
-                spellCheck={false}
-                value={state.document.markdown}
+            <EditorMarkdownPanel
+              dropLabel={t(state.ui.locale, 'drop.image')}
+              isImageDropActive={isImageDropActive}
+              onChange={(markdown) => void commands.setEditorMarkdown(markdown)}
+              onDragStateChange={setIsImageDropActive}
+              onDropImage={handleDropImage}
+              panelLabel={t(state.ui.locale, 'panel.markdown')}
+              panelWidth={editorPaneWidth}
+              textareaRef={textareaRef}
+              value={activeTab?.markdown ?? ''}
+            />
+            {state.ui.showPreview ? (
+              <>
+                <div
+                  className="editor-resizer"
+                  onPointerDown={onStartEditorResize}
+                  role="separator"
+                />
+                <EditorPreviewPanel
+                  html={activeTab?.html ?? ''}
+                  label={t(state.ui.locale, 'panel.preview')}
+                  onOpenDocumentReference={(reference) =>
+                    void handleOpenDocumentReference(reference)
+                  }
+                  previewRef={previewRef}
+                />
+              </>
+            ) : null}
+            <div className="editor-sidepanes">
+              <OutlinePanel
+                locale={state.ui.locale}
+                onSelectHeading={focusHeading}
+                outline={outline}
               />
-            </section>
-            <div className="editor-resizer" onPointerDown={onStartResize} role="separator" />
-            <section className="panel editor-preview-panel">
-              <div className="panel-label">{t(state.ui.locale, 'panel.preview')}</div>
-              <article className="preview-content" dangerouslySetInnerHTML={{ __html: state.document.html }} />
-            </section>
+              <BacklinksPanel
+                backlinks={state.workspace.backlinks}
+                hasDocumentPath={Boolean(activeTab?.filePath)}
+                isBusy={state.ui.isBacklinksBusy}
+                locale={state.ui.locale}
+                onOpenBacklink={(filePath, line) => void handleOpenBacklink(filePath, line)}
+              />
+            </div>
           </main>
         </div>
       </div>

@@ -1,22 +1,39 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import {
+import { IPC_CHANNELS } from '../shared'
+import type {
   DesktopApi,
-  IPC_CHANNELS,
-  SaveFileRequest,
+  ExportHtmlRequest,
+  ImportImageRequest,
   OpenByPathRequest,
-  ExportHtmlRequest
-} from '../shared/editor-ipc'
+  OpenDirectoryByPathRequest,
+  SaveFileRequest,
+  SearchDirectoryRequest
+} from '../shared'
 
 // Custom APIs for renderer
 const api: DesktopApi = {
   file: {
     open: () => ipcRenderer.invoke(IPC_CHANNELS.fileOpen),
     openDirectory: () => ipcRenderer.invoke(IPC_CHANNELS.folderOpen),
-    openByPath: (request: OpenByPathRequest) => ipcRenderer.invoke(IPC_CHANNELS.fileOpenByPath, request),
+    openDirectoryByPath: (request: OpenDirectoryByPathRequest) =>
+      ipcRenderer.invoke(IPC_CHANNELS.folderOpenByPath, request),
+    recentFolders: () => ipcRenderer.invoke(IPC_CHANNELS.folderRecentList),
+    pinnedFolders: () => ipcRenderer.invoke(IPC_CHANNELS.folderPinnedList),
+    pinFolder: (request: OpenDirectoryByPathRequest) =>
+      ipcRenderer.invoke(IPC_CHANNELS.folderPin, request),
+    unpinFolder: (request: OpenDirectoryByPathRequest) =>
+      ipcRenderer.invoke(IPC_CHANNELS.folderUnpin, request),
+    searchDirectory: (request: SearchDirectoryRequest) =>
+      ipcRenderer.invoke(IPC_CHANNELS.folderSearch, request),
+    findBacklinks: (request) => ipcRenderer.invoke(IPC_CHANNELS.folderBacklinks, request),
+    openByPath: (request: OpenByPathRequest) =>
+      ipcRenderer.invoke(IPC_CHANNELS.fileOpenByPath, request),
     recentList: () => ipcRenderer.invoke(IPC_CHANNELS.fileRecentList),
     save: (request: SaveFileRequest) => ipcRenderer.invoke(IPC_CHANNELS.fileSave, request),
     saveAs: (request: SaveFileRequest) => ipcRenderer.invoke(IPC_CHANNELS.fileSaveAs, request),
+    importImage: (request: ImportImageRequest) =>
+      ipcRenderer.invoke(IPC_CHANNELS.imageImport, request),
     exportHtml: (request: ExportHtmlRequest) => ipcRenderer.invoke(IPC_CHANNELS.exportHtml, request)
   },
   app: {
