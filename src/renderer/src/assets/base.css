@@ -149,12 +149,30 @@ body {
   animation: theme-circle-reveal 460ms ease-out both;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
 @keyframes theme-circle-reveal {
   from {
     clip-path: circle(0 at var(--theme-transition-x, 50vw) var(--theme-transition-y, 50vh));
   }
 
   to {
-    clip-path: circle(var(--theme-transition-radius, 150vmax) at var(--theme-transition-x, 50vw) var(--theme-transition-y, 50vh));
+    clip-path: circle(
+      var(--theme-transition-radius, 150vmax) at var(--theme-transition-x, 50vw)
+        var(--theme-transition-y, 50vh)
+    );
   }
 }

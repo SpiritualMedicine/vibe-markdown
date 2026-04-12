@@ -1,0 +1,74 @@
+@media (max-width: 900px) {
+  .editor-actions {
+    width: 100%;
+  }
+
+  .window-controls {
+    width: 100%;
+    justify-content: flex-end;
+    margin-left: 0;
+  }
+
+  .recent-select {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .editor-body {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .explorer-sidebar {
+    width: 240px;
+    min-width: 200px;
+  }
+
+  .editor-input-panel,
+  .editor-preview-panel {
+    min-width: 280px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .editor-body {
+    gap: 10px;
+  }
+
+  .explorer-sidebar {
+    width: 240px;
+    min-width: 200px;
+    max-width: 34vw;
+  }
+
+  .editor-sidepanes {
+    width: 160px;
+    min-width: 160px;
+    flex-basis: 160px;
+  }
+}
+
+@media (max-width: 1040px) {
+  .editor-workspace {
+    flex-wrap: wrap;
+    overflow: auto;
+    gap: 10px;
+  }
+
+  .editor-input-panel,
+  .editor-preview-panel {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 320px;
+  }
+
+  .editor-resizer {
+    display: none;
+  }
+
+  .editor-sidepanes {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 100%;
+    min-height: 360px;
+  }
+}

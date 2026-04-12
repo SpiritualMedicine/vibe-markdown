@@ -1,0 +1,152 @@
+body {
+  overflow: hidden;
+}
+
+.editor-shell {
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  background:
+    radial-gradient(
+      1200px circle at 0% -10%,
+      color-mix(in srgb, var(--accent) 16%, transparent) 0%,
+      transparent 62%
+    ),
+    radial-gradient(
+      900px circle at 105% 110%,
+      color-mix(in srgb, var(--accent) 20%, transparent) 0%,
+      transparent 58%
+    ),
+    var(--page-base);
+}
+
+.editor-body {
+  min-height: 0;
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: var(--body-bg);
+  border-radius: 14px;
+}
+
+.editor-main {
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 12px;
+}
+
+.editor-workspace {
+  display: flex;
+  min-width: 0;
+  gap: 0;
+  padding: 0;
+  min-height: 0;
+  overflow: hidden;
+  flex-wrap: nowrap;
+}
+
+.panel {
+  min-height: 0;
+  border: 1px solid color-mix(in srgb, var(--line) 90%, #fff);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface-strong) 90%, transparent);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  box-shadow: var(--elev-shadow);
+}
+
+.panel-label {
+  font-size: 12px;
+  letter-spacing: 0.55px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface-strong));
+}
+
+.resizable-panel {
+  resize: horizontal;
+  overflow: auto;
+}
+
+.explorer-sidebar {
+  width: 280px;
+  min-width: 220px;
+  max-width: 45vw;
+  flex: 0 0 auto;
+}
+
+.outline-panel {
+  width: clamp(180px, 18vw, 220px);
+  min-width: 180px;
+  flex: 0 0 clamp(180px, 18vw, 220px);
+}
+
+.editor-sidepanes {
+  width: clamp(180px, 18vw, 220px);
+  min-width: 180px;
+  flex: 0 0 clamp(180px, 18vw, 220px);
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.editor-sidepanes .outline-panel,
+.editor-sidepanes .backlinks-panel {
+  width: 100%;
+  min-width: 0;
+  flex: none;
+}
+
+.sidebar-resizer,
+.editor-resizer {
+  width: 12px;
+  flex: 0 0 12px;
+  cursor: col-resize;
+  position: relative;
+  user-select: none;
+  touch-action: none;
+}
+
+.sidebar-resizer::before,
+.editor-resizer::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 14px;
+  bottom: 14px;
+  width: 2px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--line) 88%, #fff);
+}
+
+.sidebar-resizer:hover::before,
+.editor-resizer:hover::before {
+  background: var(--accent);
+}
+
+.editor-input-panel,
+.editor-preview-panel {
+  min-width: 0;
+}
+
+.editor-input-panel {
+  flex: 0 0 auto;
+  position: relative;
+}
+
+.editor-preview-panel {
+  flex: 1 1 0;
+}
+
+body.is-resizing {
+  cursor: col-resize !important;
+  user-select: none;
+}

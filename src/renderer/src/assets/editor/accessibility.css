@@ -1,0 +1,24 @@
+.editor-actions button:focus-visible,
+.window-control:focus-visible,
+.recent-select:focus-visible,
+.theme-select:focus-visible,
+.language-select:focus-visible,
+.explorer-search-input:focus-visible,
+.search-result-button:focus-visible,
+.outline-link:focus-visible,
+.backlink-link:focus-visible,
+.editor-tab:focus-visible,
+.editor-tab-add:focus-visible,
+.editor-textarea:focus-visible,
+.explorer-header button:focus-visible,
+.explorer-chip:focus-visible,
+.explorer-chip-remove:focus-visible,
+.explorer-file:focus-visible,
+.explorer-directory > summary:focus-visible,
+.autosave-switch-input:focus-visible,
+.locale-switch-input:focus-visible,
+.tab-context-menu button:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}

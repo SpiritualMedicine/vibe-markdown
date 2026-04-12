@@ -1,0 +1,262 @@
+.editor-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--surface-strong) 86%, transparent);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 22px rgba(159, 18, 57, 0.12);
+}
+
+.editor-tabs {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  overflow: auto;
+  padding: 0 4px;
+}
+
+.editor-tab,
+.editor-tab-add {
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-strong) 88%, transparent);
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  cursor: pointer;
+  flex: 0 0 auto;
+  transition:
+    border-color 140ms ease-out,
+    background-color 140ms ease-out,
+    color 140ms ease-out;
+}
+
+.editor-tab {
+  max-width: 240px;
+}
+
+.editor-tab.is-active {
+  color: var(--ink);
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 13%, #fff);
+}
+
+.editor-tab.is-dragging {
+  opacity: 0.55;
+  transform: scale(0.98);
+}
+
+.editor-tab-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-tab-close {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1;
+  transition: color 140ms ease-out;
+}
+
+.editor-tab-add {
+  width: 38px;
+  justify-content: center;
+  padding: 0;
+  font-size: 18px;
+}
+
+.tab-context-menu {
+  position: fixed;
+  z-index: 50;
+  min-width: 180px;
+  display: grid;
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-strong) 94%, #fff);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
+}
+
+.tab-context-menu button {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition:
+    border-color 140ms ease-out,
+    background-color 140ms ease-out;
+}
+
+.tab-context-menu button:hover {
+  border-color: var(--line);
+  background: color-mix(in srgb, var(--accent) 10%, #fff);
+}
+
+.editor-meta-left {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.autosave-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+}
+
+.autosave-switch-track {
+  width: 34px;
+  height: 20px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 84%, #fff);
+  padding: 2px;
+  display: inline-flex;
+  align-items: center;
+  transition:
+    background-color 140ms ease-out,
+    border-color 140ms ease-out,
+    box-shadow 140ms ease-out;
+}
+
+.autosave-switch-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--surface-strong);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.22);
+  transition: transform 140ms ease-out;
+}
+
+.autosave-switch-input:checked + .autosave-switch-track {
+  background: color-mix(in srgb, var(--accent) 58%, #fff);
+  border-color: color-mix(in srgb, var(--accent) 78%, #fff);
+}
+
+.autosave-switch-input:checked + .autosave-switch-track .autosave-switch-thumb {
+  transform: translateX(14px);
+}
+
+.autosave-switch-input:focus-visible + .autosave-switch-track {
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.autosave-switch:hover .autosave-switch-track {
+  border-color: var(--accent);
+}
+
+.autosave-switch-label {
+  color: var(--muted);
+  margin-left: 0;
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition:
+    max-width 140ms ease-out,
+    opacity 140ms ease-out,
+    margin-left 140ms ease-out;
+}
+
+.autosave-switch:hover .autosave-switch-label,
+.autosave-switch:focus-within .autosave-switch-label {
+  margin-left: 8px;
+  max-width: 120px;
+  opacity: 1;
+}
+
+.file-name {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.status-success {
+  color: color-mix(in srgb, var(--muted) 85%, var(--heading));
+}
+
+.status-error {
+  color: color-mix(in srgb, var(--accent) 85%, var(--heading));
+}
+
+.editor-input-panel:focus-within {
+  border-color: var(--accent);
+}
+
+.editor-input-panel:focus-within .panel-label {
+  border-bottom-color: var(--accent);
+  color: var(--accent);
+}
+
+.editor-textarea {
+  width: 100%;
+  height: 100%;
+  border: none;
+  resize: none;
+  outline: none;
+  background: transparent;
+  color: var(--ink);
+  padding: 16px;
+  font-size: 14px;
+  line-height: 1.7;
+  tab-size: 2;
+  caret-color: var(--accent);
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+}
+
+.editor-textarea.is-drop-target {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.editor-drop-overlay {
+  position: absolute;
+  inset: 48px 12px 12px;
+  border: 2px dashed color-mix(in srgb, var(--accent) 72%, #fff);
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--accent) 10%, #fff);
+  color: var(--accent);
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.tiptap-editor {
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+}
+
+.tiptap-editor .ProseMirror {
+  min-height: 100%;
+  outline: none;
+  background: var(--editor-bg);
+  color: var(--ink);
+  padding: 16px;
+  font-size: 14px;
+  line-height: 1.7;
+  tab-size: 2;
+  caret-color: var(--accent);
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+}
