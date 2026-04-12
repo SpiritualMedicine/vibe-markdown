@@ -13,7 +13,12 @@ import type {
   OpenByPathRequest,
   OpenDirectoryByPathRequest,
   SaveFileRequest,
-  SearchDirectoryRequest
+  SearchDirectoryRequest,
+  TemplateListResult,
+  TemplateSaveRequest,
+  TemplateSaveResult,
+  TemplateDeleteRequest,
+  TemplateDeleteResult
 } from '../../../../shared'
 
 export interface DesktopClient {
@@ -33,6 +38,9 @@ export interface DesktopClient {
     saveAs: (request: SaveFileRequest) => Promise<FileSaveResult>
     importImage: (request: ImportImageRequest) => Promise<ImportImageResult>
     exportHtml: (request: ExportHtmlRequest) => Promise<FileSaveResult>
+    listTemplates: () => Promise<TemplateListResult>
+    saveTemplate: (request: TemplateSaveRequest) => Promise<TemplateSaveResult>
+    deleteTemplate: (request: TemplateDeleteRequest) => Promise<TemplateDeleteResult>
   }
   app: {
     setDirtyState: (isDirty: boolean) => void

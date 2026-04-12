@@ -82,6 +82,16 @@ export type LocaleKey =
   | 'template.meetingNotes'
   | 'template.projectReadme'
   | 'template.weeklyPlan'
+  | 'template.manage'
+  | 'template.create'
+  | 'template.createTitle'
+  | 'template.namePlaceholder'
+  | 'template.createSuccess'
+  | 'template.createFailed'
+  | 'template.deleteConfirm'
+  | 'template.deleteSuccess'
+  | 'template.deleteFailed'
+  | 'template.noCustom'
 
 type Messages = Record<LocaleKey, string>
 
@@ -159,7 +169,17 @@ const zhCN: Messages = {
   'template.blank': '空白文档',
   'template.meetingNotes': '会议纪要',
   'template.projectReadme': '项目 README',
-  'template.weeklyPlan': '周计划'
+  'template.weeklyPlan': '周计划',
+  'template.manage': '管理模板',
+  'template.create': '创建模板',
+  'template.createTitle': '保存为模板',
+  'template.namePlaceholder': '模板名称',
+  'template.createSuccess': '模板已保存',
+  'template.createFailed': '保存模板失败',
+  'template.deleteConfirm': '确定要删除模板 "{name}" 吗？',
+  'template.deleteSuccess': '模板已删除',
+  'template.deleteFailed': '删除模板失败',
+  'template.noCustom': '暂无自定义模板'
 }
 
 const enUS: Messages = {
@@ -236,7 +256,17 @@ const enUS: Messages = {
   'template.blank': 'Blank Document',
   'template.meetingNotes': 'Meeting Notes',
   'template.projectReadme': 'Project README',
-  'template.weeklyPlan': 'Weekly Plan'
+  'template.weeklyPlan': 'Weekly Plan',
+  'template.manage': 'Manage Templates',
+  'template.create': 'Create Template',
+  'template.createTitle': 'Save as Template',
+  'template.namePlaceholder': 'Template Name',
+  'template.createSuccess': 'Template saved',
+  'template.createFailed': 'Failed to save template',
+  'template.deleteConfirm': 'Are you sure you want to delete template "{name}"?',
+  'template.deleteSuccess': 'Template deleted',
+  'template.deleteFailed': 'Failed to delete template',
+  'template.noCustom': 'No custom templates yet'
 }
 
 const messageMap: Record<EditorLocale, Messages> = {

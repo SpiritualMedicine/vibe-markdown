@@ -8,7 +8,9 @@ import type {
   OpenByPathRequest,
   OpenDirectoryByPathRequest,
   SaveFileRequest,
-  SearchDirectoryRequest
+  SearchDirectoryRequest,
+  TemplateSaveRequest,
+  TemplateDeleteRequest
 } from '../shared'
 
 // Custom APIs for renderer
@@ -34,7 +36,13 @@ const api: DesktopApi = {
     saveAs: (request: SaveFileRequest) => ipcRenderer.invoke(IPC_CHANNELS.fileSaveAs, request),
     importImage: (request: ImportImageRequest) =>
       ipcRenderer.invoke(IPC_CHANNELS.imageImport, request),
-    exportHtml: (request: ExportHtmlRequest) => ipcRenderer.invoke(IPC_CHANNELS.exportHtml, request)
+    exportHtml: (request: ExportHtmlRequest) =>
+      ipcRenderer.invoke(IPC_CHANNELS.exportHtml, request),
+    listTemplates: () => ipcRenderer.invoke(IPC_CHANNELS.templateList),
+    saveTemplate: (request: TemplateSaveRequest) =>
+      ipcRenderer.invoke(IPC_CHANNELS.templateSave, request),
+    deleteTemplate: (request: TemplateDeleteRequest) =>
+      ipcRenderer.invoke(IPC_CHANNELS.templateDelete, request)
   },
   app: {
     setDirtyState: (isDirty: boolean) => ipcRenderer.send(IPC_CHANNELS.appSetDirtyState, isDirty),

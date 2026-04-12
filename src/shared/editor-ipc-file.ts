@@ -80,3 +80,35 @@ export interface ExportHtmlRequest {
   suggestedName: string
   html: string
 }
+
+export interface UserTemplate {
+  id: string
+  name: string
+  markdown: string
+  createdAt: number
+  updatedAt: number
+}
+
+export interface TemplateListResult {
+  templates: UserTemplate[]
+  error?: string
+}
+
+export interface TemplateSaveRequest {
+  name: string
+  markdown: string
+}
+
+export interface TemplateSaveResult {
+  id: string | null
+  error?: string
+}
+
+export interface TemplateDeleteRequest {
+  id: string
+}
+
+export interface TemplateDeleteResult {
+  success: boolean
+  error?: string
+}

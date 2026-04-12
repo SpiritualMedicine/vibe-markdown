@@ -6,7 +6,9 @@ import type {
   OpenByPathRequest,
   OpenDirectoryByPathRequest,
   SaveFileRequest,
-  SearchDirectoryRequest
+  SearchDirectoryRequest,
+  TemplateSaveRequest,
+  TemplateDeleteRequest
 } from '../../shared'
 import { IPC_CHANNELS } from '../../shared'
 import {
@@ -27,6 +29,7 @@ import {
   pinFolder,
   unpinFolder
 } from '../editorPersistence'
+import { listTemplates, saveTemplate, deleteTemplate } from '../templateManager'
 
 export function registerEditorIpcHandlers(): void {
   ipcMain.handle(IPC_CHANNELS.fileOpen, () => openFile())
@@ -64,6 +67,13 @@ export function registerEditorIpcHandlers(): void {
   ipcMain.handle(IPC_CHANNELS.exportHtml, (_event, request: ExportHtmlRequest) =>
     exportHtml(request)
   )
+  ipcMain.handle(IPC_CHANNELS.templateList, () => listTemplates())
+  ipcMain.handle(IPC_CHANNELS.templateSave, (_event, request: TemplateSaveRequest) =>
+    saveTemplate(request)
+  )
+  ipcMain.handle(IPC_CHANNELS.templateDelete, (_event, request: TemplateDeleteRequest) =>
+    deleteTemplate(request)
+  )
   ipcMain.handle(IPC_CHANNELS.appLaunchState, () => getLaunchState())
 }
 
@@ -83,5 +93,8 @@ export function unregisterEditorIpcHandlers(): void {
   ipcMain.removeHandler(IPC_CHANNELS.folderBacklinks)
   ipcMain.removeHandler(IPC_CHANNELS.imageImport)
   ipcMain.removeHandler(IPC_CHANNELS.exportHtml)
+  ipcMain.removeHandler(IPC_CHANNELS.templateList)
+  ipcMain.removeHandler(IPC_CHANNELS.templateSave)
+  ipcMain.removeHandler(IPC_CHANNELS.templateDelete)
   ipcMain.removeHandler(IPC_CHANNELS.appLaunchState)
 }

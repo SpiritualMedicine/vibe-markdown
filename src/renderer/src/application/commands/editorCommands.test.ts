@@ -154,7 +154,10 @@ function createEditorCommandHarness(
         save: vi.fn(),
         saveAs: vi.fn(),
         importImage: vi.fn(),
-        exportHtml: vi.fn()
+        exportHtml: vi.fn(),
+        listTemplates: vi.fn().mockResolvedValue({ templates: [] }),
+        saveTemplate: vi.fn().mockResolvedValue({ id: null }),
+        deleteTemplate: vi.fn().mockResolvedValue({ success: false })
       },
       app: {
         setDirtyState: vi.fn(),

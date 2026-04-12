@@ -15,5 +15,11 @@ export type {
   OpenByPathRequest,
   OpenDirectoryByPathRequest,
   SaveFileRequest,
-  SearchDirectoryRequest
+  SearchDirectoryRequest,
+  UserTemplate,
+  TemplateListResult,
+  TemplateSaveRequest,
+  TemplateSaveResult,
+  TemplateDeleteRequest,
+  TemplateDeleteResult
 } from './editor-ipc-file'
