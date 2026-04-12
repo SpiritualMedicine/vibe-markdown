@@ -1,3 +1,12 @@
+:root {
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+}
+
 body {
   overflow: hidden;
 }
@@ -23,8 +32,8 @@ body {
 .editor-body {
   min-height: 0;
   display: flex;
-  gap: 12px;
-  padding: 12px;
+  gap: var(--space-md);
+  padding: var(--space-md);
   background: var(--body-bg);
   border-radius: 14px;
 }
@@ -35,7 +44,7 @@ body {
   flex: 1;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .editor-workspace {
@@ -65,7 +74,7 @@ body {
   text-transform: uppercase;
   font-weight: 700;
   color: var(--muted);
-  padding: 11px 14px;
+  padding: var(--space-sm) var(--space-md);
   border-bottom: 1px solid var(--line);
   background: color-mix(in srgb, var(--accent) 12%, var(--surface-strong));
 }
@@ -95,7 +104,7 @@ body {
   min-height: 0;
   display: grid;
   grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .editor-sidepanes .outline-panel,
