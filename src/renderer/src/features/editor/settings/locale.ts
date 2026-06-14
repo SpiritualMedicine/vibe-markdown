@@ -28,6 +28,17 @@ export type LocaleKey =
   | 'toolbar.action.save'
   | 'toolbar.action.saveAs'
   | 'toolbar.action.exportHtml'
+  | 'commandPalette.open'
+  | 'commandPalette.title'
+  | 'commandPalette.shortcut'
+  | 'commandPalette.placeholder'
+  | 'commandPalette.empty'
+  | 'commandPalette.group.command'
+  | 'commandPalette.group.file'
+  | 'commandPalette.group.recent'
+  | 'commandPalette.group.template'
+  | 'commandPalette.previewVisible'
+  | 'commandPalette.previewHidden'
   | 'panel.directory'
   | 'panel.markdown'
   | 'panel.preview'
@@ -124,6 +135,17 @@ const zhCN: Messages = {
   'toolbar.action.save': '保存',
   'toolbar.action.saveAs': '另存为',
   'toolbar.action.exportHtml': '导出 HTML',
+  'commandPalette.open': '打开命令面板',
+  'commandPalette.title': '命令面板',
+  'commandPalette.shortcut': 'Ctrl K',
+  'commandPalette.placeholder': '搜索命令、文件或模板',
+  'commandPalette.empty': '没有匹配项',
+  'commandPalette.group.command': '命令',
+  'commandPalette.group.file': '文件',
+  'commandPalette.group.recent': '最近',
+  'commandPalette.group.template': '模板',
+  'commandPalette.previewVisible': '预览已显示',
+  'commandPalette.previewHidden': '预览已隐藏',
   'panel.directory': '目录',
   'panel.markdown': 'Markdown',
   'panel.preview': '预览',
@@ -219,6 +241,17 @@ const enUS: Messages = {
   'toolbar.action.save': 'Save',
   'toolbar.action.saveAs': 'Save As',
   'toolbar.action.exportHtml': 'Export HTML',
+  'commandPalette.open': 'Open Command Palette',
+  'commandPalette.title': 'Command Palette',
+  'commandPalette.shortcut': 'Ctrl K',
+  'commandPalette.placeholder': 'Search commands, files, or templates',
+  'commandPalette.empty': 'No matches',
+  'commandPalette.group.command': 'Command',
+  'commandPalette.group.file': 'File',
+  'commandPalette.group.recent': 'Recent',
+  'commandPalette.group.template': 'Template',
+  'commandPalette.previewVisible': 'Preview is visible',
+  'commandPalette.previewHidden': 'Preview is hidden',
   'panel.directory': 'Directory',
   'panel.markdown': 'Markdown',
   'panel.preview': 'Preview',

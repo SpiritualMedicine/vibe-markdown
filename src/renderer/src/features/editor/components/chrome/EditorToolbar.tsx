@@ -19,6 +19,7 @@ interface EditorToolbarProps {
   onSaveAs: () => void
   onExportHtml: () => void
   onInsertImage?: () => void
+  onOpenCommandPalette?: () => void
   onTogglePreview?: () => void
   onMinimize: () => void
   onToggleMaximize: () => void
@@ -44,6 +45,7 @@ export function EditorToolbar(props: EditorToolbarProps): React.JSX.Element {
     onSaveAs,
     onExportHtml,
     onInsertImage = () => undefined,
+    onOpenCommandPalette = () => undefined,
     onTogglePreview = () => undefined,
     onMinimize,
     onToggleMaximize,
@@ -85,6 +87,15 @@ export function EditorToolbar(props: EditorToolbarProps): React.JSX.Element {
             </option>
           ))}
         </select>
+        <button
+          aria-label={t(locale, 'commandPalette.open')}
+          disabled={isBusy}
+          onClick={onOpenCommandPalette}
+          title={t(locale, 'commandPalette.open')}
+          type="button"
+        >
+          <span aria-hidden="true" className="action-icon action-icon-command" />
+        </button>
         <button
           aria-label={t(locale, 'toolbar.action.open')}
           disabled={isBusy}

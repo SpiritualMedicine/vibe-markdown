@@ -1,3 +1,4 @@
+export { CommandPalette } from './chrome/CommandPalette'
 export { EditorToolbar } from './chrome/EditorToolbar'
 export { RecoveryDraftBanner } from './chrome/RecoveryDraftBanner'
 export { EditorMarkdownPanel } from './editor/EditorMarkdownPanel'

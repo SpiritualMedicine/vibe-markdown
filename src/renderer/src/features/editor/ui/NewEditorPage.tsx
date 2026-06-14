@@ -1,5 +1,6 @@
 import {
   BacklinksPanel,
+  CommandPalette,
   EditorMarkdownPanel,
   EditorPreviewPanel,
   EditorStatusBar,
@@ -19,6 +20,7 @@ export default function NewEditorPage(): React.JSX.Element {
     activeSearchResultKey,
     activeTab,
     bodyRef,
+    commandPaletteItems,
     directoryPaneWidth,
     editorPaneWidth,
     draggingTabId,
@@ -26,12 +28,14 @@ export default function NewEditorPage(): React.JSX.Element {
     handleDropImage,
     handleInsertImage,
     handleOpenBacklink,
+    handleCommandPaletteSelect,
     handleOpenDocumentReference,
     handleOpenFolder,
     handleOpenFolderFromPath,
     handleOpenSearchResult,
     handleSearchKeyDown,
     handleTabDrop,
+    isCommandPaletteOpen,
     isImageDropActive,
     onStartDirectoryResize,
     onStartEditorResize,
@@ -39,6 +43,7 @@ export default function NewEditorPage(): React.JSX.Element {
     previewRef,
     searchInput,
     setDraggingTabId,
+    setIsCommandPaletteOpen,
     setIsImageDropActive,
     setSearchInput,
     setTabMenu,
@@ -63,6 +68,7 @@ export default function NewEditorPage(): React.JSX.Element {
         onNew={() => void commands.newDoc()}
         onNewFromTemplate={(templateId) => void commands.newDocFromTemplate(templateId)}
         onOpen={() => void commands.openDoc()}
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         onOpenFolder={() => void commands.openFolder()}
         onSave={() => void commands.saveDoc()}
         onSaveAs={() => void commands.saveAs()}
@@ -79,6 +85,14 @@ export default function NewEditorPage(): React.JSX.Element {
         onDiscardAll={() => void commands.discardAllRecoveryDrafts()}
         onDiscardDraft={(draftId) => void commands.discardRecoveryDraft(draftId)}
         onRestoreDraft={(draftId) => void commands.restoreRecoveryDraft(draftId)}
+      />
+
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        items={commandPaletteItems}
+        locale={state.ui.locale}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        onSelectItem={handleCommandPaletteSelect}
       />
 
       <div className="editor-body" ref={bodyRef}>

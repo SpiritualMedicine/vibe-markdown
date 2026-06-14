@@ -3,12 +3,15 @@ import type { DirectorySearchResult } from '../../../../../shared'
 import type { EditorStoreCommands } from '../../../state/editorStoreTypes'
 import type { EditorState } from '../../../application/commands'
 import {
+  buildCommandPaletteItems,
   extractMarkdownOutline,
   findDocumentPathByReference,
+  getCommandPaletteTemplateId,
   getDocumentBasename,
   getLineOffset,
   getSearchResultKey
 } from '../domain'
+import type { CommandPaletteItem } from '../domain'
 import { t } from '../settings'
 import { usePaneResizers } from './usePaneResizers'
 import { usePreviewScrollSync } from './usePreviewScrollSync'
@@ -34,7 +37,10 @@ interface UseEditorPageControllerResult {
   title: string
   outline: ReturnType<typeof extractMarkdownOutline>
   searchInput: string
+  commandPaletteItems: CommandPaletteItem[]
+  isCommandPaletteOpen: boolean
   setSearchInput: React.Dispatch<React.SetStateAction<string>>
+  setIsCommandPaletteOpen: React.Dispatch<React.SetStateAction<boolean>>
   isImageDropActive: boolean
   setIsImageDropActive: React.Dispatch<React.SetStateAction<boolean>>
   draggingTabId: string | null
@@ -51,6 +57,7 @@ interface UseEditorPageControllerResult {
   handleOpenBacklink: (filePath: string, lineNumber: number) => Promise<void>
   handleInsertImage: () => void
   handleOpenDocumentReference: (reference: string) => Promise<void>
+  handleCommandPaletteSelect: (item: CommandPaletteItem) => void
   handleSearchKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void
   handleDropImage: (selectionStart: number, selectionEnd: number, sourcePath: string) => void
   handleOpenFolder: () => Promise<void>
@@ -66,6 +73,7 @@ export function useEditorPageController(
   const previewRef = useRef<HTMLElement | null>(null)
   const [draggingTabId, setDraggingTabId] = useState<string | null>(null)
   const [searchInput, setSearchInput] = useState<string>(state.workspace.searchQuery)
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
   const [isImageDropActive, setIsImageDropActive] = useState(false)
   const [tabMenu, setTabMenu] = useState<TabMenuState | null>(null)
   const {
@@ -86,6 +94,23 @@ export function useEditorPageController(
   const outline = useMemo(
     () => extractMarkdownOutline(activeTab?.markdown ?? ''),
     [activeTab?.markdown]
+  )
+  const commandPaletteItems = useMemo(
+    () =>
+      buildCommandPaletteItems({
+        canSave: Boolean(activeTab?.isDirty),
+        directoryEntries: state.workspace.directoryEntries,
+        locale: state.ui.locale,
+        recentFiles: state.workspace.recentFiles,
+        showPreview: state.ui.showPreview
+      }),
+    [
+      activeTab?.isDirty,
+      state.ui.locale,
+      state.ui.showPreview,
+      state.workspace.directoryEntries,
+      state.workspace.recentFiles
+    ]
   )
 
   const {
@@ -113,7 +138,10 @@ export function useEditorPageController(
         return
       }
       const key = event.key.toLowerCase()
-      if (key === 's') {
+      if (key === 'k' || key === 'p') {
+        event.preventDefault()
+        setIsCommandPaletteOpen(true)
+      } else if (key === 's') {
         event.preventDefault()
         void commands.saveDoc()
       } else if (key === 'o') {
@@ -287,6 +315,40 @@ export function useEditorPageController(
     [commands]
   )
 
+  const handleCommandPaletteSelect = useCallback(
+    (item: CommandPaletteItem): void => {
+      setIsCommandPaletteOpen(false)
+
+      if (item.id === 'command:new') {
+        void commands.newDoc()
+      } else if (item.id === 'command:open') {
+        void commands.openDoc()
+      } else if (item.id === 'command:openFolder') {
+        void handleOpenFolder()
+      } else if (item.id === 'command:save') {
+        void commands.saveDoc()
+      } else if (item.id === 'command:saveAs') {
+        void commands.saveAs()
+      } else if (item.id === 'command:exportHtml') {
+        void commands.exportHtml()
+      } else if (item.id === 'command:insertImage') {
+        handleInsertImage()
+      } else if (item.id === 'command:togglePreview') {
+        void commands.togglePreview()
+      } else if (item.id.startsWith('file:')) {
+        void commands.openFromPath(item.id.slice('file:'.length))
+      } else if (item.id.startsWith('recent:')) {
+        void commands.openFromPath(item.id.slice('recent:'.length))
+      } else {
+        const templateId = getCommandPaletteTemplateId(item)
+        if (templateId) {
+          void commands.newDocFromTemplate(templateId)
+        }
+      }
+    },
+    [commands, handleInsertImage, handleOpenFolder]
+  )
+
   const handleTabDrop = useCallback(
     (targetTabId: string, sourceTabId: string | null): void => {
       setDraggingTabId(null)
@@ -306,7 +368,10 @@ export function useEditorPageController(
     title,
     outline,
     searchInput,
+    commandPaletteItems,
+    isCommandPaletteOpen,
     setSearchInput,
+    setIsCommandPaletteOpen,
     isImageDropActive,
     setIsImageDropActive,
     draggingTabId,
@@ -324,6 +389,7 @@ export function useEditorPageController(
     handleOpenSearchResult,
     handleOpenBacklink,
     handleOpenDocumentReference,
+    handleCommandPaletteSelect,
     handleInsertImage,
     handleSearchKeyDown,
     handleDropImage,
