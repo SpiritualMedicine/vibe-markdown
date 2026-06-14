@@ -158,3 +158,10 @@ Rich-text support is treated as a future capability, not the primary path today.
 - file-based Markdown storage
 - predictable save/export behavior
 - compatibility with existing templates, references, and backlinks
+
+## Runtime Direction
+
+Electron is the supported runtime. The production application is built around Electron's main
+process, sandboxed preload bridge, renderer process, and shared IPC contracts. Experiments with
+other desktop runtimes should remain isolated from the main application path until there is a
+documented migration plan covering filesystem access, IPC, packaging, updater behavior, and tests.

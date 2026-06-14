@@ -9,7 +9,7 @@ import {
 } from './ipc'
 
 app.whenReady().then(() => {
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('app.markdownleo.vibemarkdown')
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)

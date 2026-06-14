@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, type JSX } from 'react'
 import { t, type EditorLocale } from '../../settings'
 
 interface UserTemplate {
@@ -25,7 +25,7 @@ export function TemplateManagerDialog({
   onUseTemplate,
   onDeleteTemplate,
   templates
-}: TemplateManagerDialogProps) {
+}: TemplateManagerDialogProps): JSX.Element | null {
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const handleDelete = useCallback(

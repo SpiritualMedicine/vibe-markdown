@@ -5,6 +5,18 @@ import icon from '../../resources/icon.png?asset'
 import { clearClosedWindowState } from './ipc'
 import { isWindowDirty, isWindowForceClosing, markWindowForceClose } from './windowState'
 
+function openExternalUrl(url: string): void {
+  try {
+    const parsed = new URL(url)
+    if (!['http:', 'https:', 'mailto:'].includes(parsed.protocol)) {
+      return
+    }
+    void shell.openExternal(parsed.toString())
+  } catch {
+    return
+  }
+}
+
 export function createWindow(): void {
   const mainWindow = new BrowserWindow({
     width: 1000,
@@ -21,7 +33,9 @@ export function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true
     }
   })
 
@@ -30,7 +44,7 @@ export function createWindow(): void {
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
+    openExternalUrl(details.url)
     return { action: 'deny' }
   })
 

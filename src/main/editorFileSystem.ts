@@ -27,6 +27,16 @@ import {
 const markdownFilters = [{ name: 'Markdown', extensions: ['md', 'markdown', 'txt'] }]
 const htmlFilters = [{ name: 'HTML', extensions: ['html', 'htm'] }]
 const imageFilters = [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'] }]
+const ignoredDirectoryNames = new Set([
+  '.git',
+  '.hg',
+  '.svn',
+  'node_modules',
+  'dist',
+  'out',
+  'build',
+  'coverage'
+])
 
 async function pathExists(filePath: string): Promise<boolean> {
   try {
@@ -80,12 +90,15 @@ export async function readDirectoryTree(directoryPath: string): Promise<Director
 
   const entries: DirectoryTreeEntry[] = []
   for (const item of sorted) {
-    if (item.name.startsWith('.')) {
+    if (item.name.startsWith('.') || item.isSymbolicLink()) {
       continue
     }
 
     const fullPath = join(directoryPath, item.name)
     if (item.isDirectory()) {
+      if (ignoredDirectoryNames.has(item.name)) {
+        continue
+      }
       try {
         const children = await readDirectoryTree(fullPath)
         if (children.length > 0) {
@@ -194,11 +207,14 @@ async function collectMarkdownFiles(directoryPath: string): Promise<string[]> {
   const results: string[] = []
 
   for (const item of items) {
-    if (item.name.startsWith('.')) {
+    if (item.name.startsWith('.') || item.isSymbolicLink()) {
       continue
     }
     const fullPath = join(directoryPath, item.name)
     if (item.isDirectory()) {
+      if (ignoredDirectoryNames.has(item.name)) {
+        continue
+      }
       results.push(...(await collectMarkdownFiles(fullPath)))
       continue
     }

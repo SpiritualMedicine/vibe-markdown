@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: vibe-markdown
+appId: app.markdownleo.vibemarkdown
+productName: Markdown Leo
 directories:
   buildResources: build
 files:
@@ -33,13 +33,13 @@ linux:
     - AppImage
     - snap
     - deb
-  maintainer: electronjs.org
+  maintainer: Markdown Leo contributors
   category: Utility
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
   provider: generic
-  url: https://example.com/auto-updates
+  url: https://updates.markdownleo.app/vibe-markdown
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/
