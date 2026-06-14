@@ -6,8 +6,11 @@ export {
   openDoc,
   openFromPath,
   restoreLaunchFile,
+  restoreRecoveryDraft,
   saveAs,
   saveDoc,
+  discardAllRecoveryDrafts,
+  discardRecoveryDraft,
   setEditorHtml,
   setEditorMarkdown
 } from './documentCommands'

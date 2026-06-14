@@ -1,5 +1,5 @@
 import type { EditorAction, EditorState } from '../application/commands'
-import { createEditorTab, DEFAULT_MARKDOWN } from '../features/editor/domain'
+import { createEditorTab, DEFAULT_MARKDOWN, loadRecoveryDrafts } from '../features/editor/domain'
 import { loadEditorLocale, loadEditorTheme, t as translate } from '../features/editor/settings'
 import { markdownToHtml } from '../core/editor/markdownCodec'
 
@@ -31,7 +31,8 @@ export function createInitialEditorState(): EditorState {
       isWindowMaximized: false,
       showPreview: true,
       theme: initialTheme,
-      status: { tone: 'idle', message: translate(initialLocale, 'status.ready') }
+      status: { tone: 'idle', message: translate(initialLocale, 'status.ready') },
+      recoveryDrafts: loadRecoveryDrafts()
     }
   }
 }
@@ -64,6 +65,8 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       return { ...state, ui: { ...state.ui, isWindowMaximized: action.payload } }
     case 'SET_SHOW_PREVIEW':
       return { ...state, ui: { ...state.ui, showPreview: action.payload } }
+    case 'SET_RECOVERY_DRAFTS':
+      return { ...state, ui: { ...state.ui, recoveryDrafts: action.payload } }
     default:
       return state
   }

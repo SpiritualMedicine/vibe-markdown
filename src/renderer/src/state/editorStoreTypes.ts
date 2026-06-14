@@ -10,6 +10,9 @@ export interface EditorStoreCommands {
   openFolderFromPath: (directoryPath: string) => Promise<void>
   saveDoc: () => Promise<void>
   saveAs: () => Promise<void>
+  restoreRecoveryDraft: (draftId: string) => Promise<void>
+  discardRecoveryDraft: (draftId: string) => Promise<void>
+  discardAllRecoveryDrafts: () => Promise<void>
   exportHtml: () => Promise<void>
   toggleAutoSave: (enabled: boolean) => Promise<void>
   setLocale: (locale: EditorLocale) => Promise<void>

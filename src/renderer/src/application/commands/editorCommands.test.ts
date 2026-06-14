@@ -3,6 +3,7 @@ import {
   closeTab,
   loadBacklinks,
   openFromPath,
+  restoreRecoveryDraft,
   runDirectorySearch,
   saveDoc,
   setEditorHtml,
@@ -60,7 +61,8 @@ function createEditorCommandHarness(
         filePath: '/docs/example.md',
         markdown: '# Title',
         html: '<h1>Title</h1>',
-        isDirty: false
+        isDirty: false,
+        lastSavedAt: null
       }
     ],
     activeTabId: 'tab-1',
@@ -86,6 +88,7 @@ function createEditorCommandHarness(
       showPreview: true,
       theme: 'rose',
       status: { tone: 'idle', message: 'Ready' },
+      recoveryDrafts: [],
       ...uiOverrides
     },
     ...stateOverrides
@@ -128,6 +131,9 @@ function createEditorCommandHarness(
         break
       case 'SET_SHOW_PREVIEW':
         state.ui = { ...state.ui, showPreview: action.payload }
+        break
+      case 'SET_RECOVERY_DRAFTS':
+        state.ui = { ...state.ui, recoveryDrafts: action.payload }
         break
     }
   })
@@ -267,7 +273,8 @@ describe('editorCommands', () => {
           filePath: '/docs/example.md',
           markdown: '## Persisted',
           html: '<h2>Persisted</h2>',
-          isDirty: true
+          isDirty: true,
+          lastSavedAt: null
         }
       ]
     })
@@ -296,14 +303,16 @@ describe('editorCommands', () => {
           filePath: '/docs/example.md',
           markdown: '# Dirty',
           html: '<h1>Dirty</h1>',
-          isDirty: true
+          isDirty: true,
+          lastSavedAt: null
         },
         {
           id: 'tab-2',
           filePath: '/docs/other.md',
           markdown: '# Other',
           html: '<h1>Other</h1>',
-          isDirty: false
+          isDirty: false,
+          lastSavedAt: null
         }
       ]
     })
@@ -322,14 +331,16 @@ describe('editorCommands', () => {
           filePath: '/docs/example.md',
           markdown: '# One',
           html: '<h1>One</h1>',
-          isDirty: false
+          isDirty: false,
+          lastSavedAt: null
         },
         {
           id: 'tab-2',
           filePath: '/docs/other.md',
           markdown: '# Two',
           html: '<h1>Two</h1>',
-          isDirty: false
+          isDirty: false,
+          lastSavedAt: null
         }
       ],
       activeTabId: 'tab-1'
@@ -340,6 +351,43 @@ describe('editorCommands', () => {
     expect(ctx.desktop.file.openByPath).not.toHaveBeenCalled()
     expect(getState().activeTabId).toBe('tab-2')
     expect(getState().tabs).toHaveLength(2)
+  })
+
+  it('restoreRecoveryDraft opens the draft as a dirty tab and removes it from recovery list', async () => {
+    const { ctx, getState } = createEditorCommandHarness({
+      ui: {
+        isBusy: false,
+        isDirectoryBusy: false,
+        isSearchBusy: false,
+        isBacklinksBusy: false,
+        autoSaveEnabled: true,
+        locale: 'en-US',
+        isWindowMaximized: false,
+        showPreview: true,
+        theme: 'rose',
+        status: { tone: 'idle', message: 'Ready' },
+        recoveryDrafts: [
+          {
+            id: 'draft-1',
+            filePath: '/docs/recovered.md',
+            markdown: '# Recovered',
+            updatedAt: 100
+          }
+        ]
+      }
+    })
+
+    await restoreRecoveryDraft(ctx, 'draft-1')
+
+    expect(getState().ui.recoveryDrafts).toEqual([])
+    expect(getState().activeTabId).toBe('recovered-draft-1')
+    expect(getState().tabs.at(-1)).toMatchObject({
+      id: 'recovered-draft-1',
+      filePath: '/docs/recovered.md',
+      markdown: '# Recovered',
+      html: '<p># Recovered</p>',
+      isDirty: true
+    })
   })
 
   it('loadBacklinks stores folder backlink results for the active file', async () => {

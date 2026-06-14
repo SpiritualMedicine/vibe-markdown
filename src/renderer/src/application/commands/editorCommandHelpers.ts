@@ -58,7 +58,8 @@ export function upsertOpenedTab(ctx: EditorCommandContext, result: FileOpenResul
               ...tab,
               markdown: tab.isDirty ? tab.markdown : result.content,
               html: tab.isDirty ? tab.html : ctx.markdownToHtml(result.content),
-              isDirty: tab.isDirty
+              isDirty: tab.isDirty,
+              lastSavedAt: tab.lastSavedAt
             }
           : tab
       ),
@@ -69,7 +70,8 @@ export function upsertOpenedTab(ctx: EditorCommandContext, result: FileOpenResul
 
   const nextTab: EditorTab = {
     ...createEditorTab(ctx.markdownToHtml, result.content),
-    filePath: result.filePath
+    filePath: result.filePath,
+    lastSavedAt: Date.now()
   }
   setTabs(ctx, [...state.tabs, nextTab], nextTab.id)
 }

@@ -13,7 +13,8 @@ export function createEditorTab(
     filePath: null,
     markdown,
     html: markdownToHtml(markdown),
-    isDirty: false
+    isDirty: false,
+    lastSavedAt: null
   }
 }
 

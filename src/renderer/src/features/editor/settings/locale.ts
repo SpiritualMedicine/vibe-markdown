@@ -71,6 +71,14 @@ export type LocaleKey =
   | 'status.saveBeforeImage'
   | 'status.referenceOpened'
   | 'status.referenceMissing'
+  | 'status.lastSaved'
+  | 'status.recoveryRestored'
+  | 'status.recoveryDiscarded'
+  | 'recovery.title'
+  | 'recovery.description'
+  | 'recovery.restore'
+  | 'recovery.discard'
+  | 'recovery.discardAll'
   | 'dialog.discardUnsaved'
   | 'dialog.discardOpenOther'
   | 'dialog.closeTabDiscard'
@@ -159,6 +167,14 @@ const zhCN: Messages = {
   'status.saveBeforeImage': '请先保存当前文档，再插入图片',
   'status.referenceOpened': '已打开引用文档 {target}',
   'status.referenceMissing': '未找到引用文档 {target}',
+  'status.lastSaved': '上次保存 {time}',
+  'status.recoveryRestored': '已恢复草稿',
+  'status.recoveryDiscarded': '已丢弃恢复草稿',
+  'recovery.title': '可恢复草稿',
+  'recovery.description': '发现 {count} 个未保存草稿',
+  'recovery.restore': '恢复',
+  'recovery.discard': '丢弃',
+  'recovery.discardAll': '全部丢弃',
   'dialog.discardUnsaved': '要放弃未保存的修改吗？',
   'dialog.discardOpenOther': '要放弃未保存的修改并打开其他文件吗？',
   'dialog.closeTabDiscard': '此标签页有未保存内容，确认关闭吗？',
@@ -246,6 +262,14 @@ const enUS: Messages = {
   'status.saveBeforeImage': 'Save the document before importing an image',
   'status.referenceOpened': 'Opened referenced document {target}',
   'status.referenceMissing': 'Referenced document not found: {target}',
+  'status.lastSaved': 'Saved {time}',
+  'status.recoveryRestored': 'Recovered draft',
+  'status.recoveryDiscarded': 'Recovery draft discarded',
+  'recovery.title': 'Recoverable drafts',
+  'recovery.description': '{count} unsaved draft(s) found',
+  'recovery.restore': 'Restore',
+  'recovery.discard': 'Discard',
+  'recovery.discardAll': 'Discard all',
   'dialog.discardUnsaved': 'Discard unsaved changes?',
   'dialog.discardOpenOther': 'Discard unsaved changes and open another file?',
   'dialog.closeTabDiscard': 'This tab has unsaved changes. Close it anyway?',

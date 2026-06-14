@@ -8,6 +8,11 @@ import {
 } from '../application/commands'
 import type { EditorCommandContext, EditorState } from '../application/commands'
 import {
+  createRecoveryDraftsFromTabs,
+  mergeRecoveryDrafts,
+  saveRecoveryDrafts
+} from '../features/editor/domain'
+import {
   applyEditorLocale,
   applyEditorTheme,
   saveEditorLocale,
@@ -60,6 +65,14 @@ export function useEditorStoreEffects(options: UseEditorStoreEffectsOptions): vo
     }, 1200)
     return () => window.clearTimeout(timer)
   }, [commands, state.activeTabId, state.tabs, state.ui.autoSaveEnabled])
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const activeDrafts = createRecoveryDraftsFromTabs(state.tabs, Date.now())
+      saveRecoveryDrafts(mergeRecoveryDrafts(state.ui.recoveryDrafts, activeDrafts))
+    }, 300)
+    return () => window.clearTimeout(timer)
+  }, [state.tabs, state.ui.recoveryDrafts])
 
   useEffect(() => {
     const activeTab = state.tabs.find((tab) => tab.id === state.activeTabId)

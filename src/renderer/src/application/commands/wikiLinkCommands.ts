@@ -68,7 +68,8 @@ export async function navigateToWikiLink(
     updateTab(ctx, state.activeTabId, (tab) => ({
       ...tab,
       filePath: result.filePath!,
-      isDirty: tab.isDirty
+      isDirty: tab.isDirty,
+      lastSavedAt: tab.lastSavedAt
     }))
     setStatus(ctx, 'success', ctx.t('status.referenceOpened', { target: linkPath }))
   }

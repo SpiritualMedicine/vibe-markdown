@@ -114,3 +114,9 @@ Users should feel that Markdown Leo is a writing workspace rather than only a Ma
 - Document references
 - Plugin support
 - AI assistance
+
+## Expanded Planning
+
+See `docs/FEATURE_BACKLOG.md` for a broader feature backlog covering reliability, workspace
+navigation, Markdown editing, export workflows, knowledge features, personalization, and strategic
+experiments.

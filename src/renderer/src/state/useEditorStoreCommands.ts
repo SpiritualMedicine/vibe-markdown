@@ -14,9 +14,12 @@ import {
   openFromPath,
   refreshWindowMaximized,
   reorderTabs,
+  restoreRecoveryDraft,
   runDirectorySearch,
   saveAs,
   saveDoc,
+  discardAllRecoveryDrafts,
+  discardRecoveryDraft,
   setEditorHtml,
   setEditorMarkdown,
   setLocale,
@@ -53,6 +56,11 @@ export function useEditorStoreCommands(
         runCommand((commandCtx) => openFolderFromPath(commandCtx, { directoryPath })),
       saveDoc: () => runCommand(saveDoc),
       saveAs: () => runCommand(saveAs),
+      restoreRecoveryDraft: (draftId: string) =>
+        runCommand((commandCtx) => restoreRecoveryDraft(commandCtx, draftId)),
+      discardRecoveryDraft: (draftId: string) =>
+        runCommand((commandCtx) => discardRecoveryDraft(commandCtx, draftId)),
+      discardAllRecoveryDrafts: () => runCommand(discardAllRecoveryDrafts),
       exportHtml: () => runCommand(exportHtml),
       toggleAutoSave: (enabled: boolean) =>
         runCommand((commandCtx) => toggleAutoSave(commandCtx, enabled)),

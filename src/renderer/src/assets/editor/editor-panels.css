@@ -200,6 +200,11 @@
   color: color-mix(in srgb, var(--accent) 85%, var(--heading));
 }
 
+.last-saved {
+  color: var(--muted);
+  white-space: nowrap;
+}
+
 .editor-input-panel:focus-within {
   border-color: var(--accent);
 }

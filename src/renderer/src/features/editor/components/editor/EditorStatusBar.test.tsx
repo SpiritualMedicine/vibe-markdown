@@ -13,16 +13,17 @@ describe('EditorStatusBar', () => {
     render(
       <EditorStatusBar
         autoSaveEnabled
+        lastSavedAt={null}
         locale="en-US"
         onToggleAutoSave={() => undefined}
-        statusMessage="Saved README.md"
+        statusMessage="Ready"
         statusTone="success"
         title="README.md"
       />
     )
 
     expect(screen.getByText('README.md')).toBeTruthy()
-    expect(screen.getByText('Saved README.md')).toBeTruthy()
+    expect(screen.getByText('Ready')).toBeTruthy()
   })
 
   it('toggles auto save from the switch', () => {
@@ -31,6 +32,7 @@ describe('EditorStatusBar', () => {
     render(
       <EditorStatusBar
         autoSaveEnabled={false}
+        lastSavedAt={null}
         locale="en-US"
         onToggleAutoSave={onToggleAutoSave}
         statusMessage="Ready"
@@ -42,5 +44,21 @@ describe('EditorStatusBar', () => {
     fireEvent.click(screen.getByLabelText('Auto Save'))
 
     expect(onToggleAutoSave).toHaveBeenCalledWith(true)
+  })
+
+  it('renders the last saved time when available', () => {
+    render(
+      <EditorStatusBar
+        autoSaveEnabled
+        lastSavedAt={new Date('2026-06-14T08:30:00Z').getTime()}
+        locale="en-US"
+        onToggleAutoSave={() => undefined}
+        statusMessage="Ready"
+        statusTone="success"
+        title="README.md"
+      />
+    )
+
+    expect(screen.getByText(/^Saved /)).toBeTruthy()
   })
 })

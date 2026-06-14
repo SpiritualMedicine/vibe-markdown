@@ -6,17 +6,35 @@ interface EditorStatusBarProps {
   statusTone: 'idle' | 'success' | 'error'
   statusMessage: string
   autoSaveEnabled: boolean
+  lastSavedAt: number | null
   onToggleAutoSave: (enabled: boolean) => void
 }
 
 export function EditorStatusBar(props: EditorStatusBarProps): React.JSX.Element {
-  const { locale, title, statusTone, statusMessage, autoSaveEnabled, onToggleAutoSave } = props
+  const {
+    locale,
+    title,
+    statusTone,
+    statusMessage,
+    autoSaveEnabled,
+    lastSavedAt,
+    onToggleAutoSave
+  } = props
+  const savedTimeLabel = lastSavedAt
+    ? t(locale, 'status.lastSaved', {
+        time: new Intl.DateTimeFormat(locale, {
+          hour: '2-digit',
+          minute: '2-digit'
+        }).format(new Date(lastSavedAt))
+      })
+    : null
 
   return (
     <div className="editor-meta">
       <div className="editor-meta-left">
         <span className="file-name">{title}</span>
         <span className={`status status-${statusTone}`}>{statusMessage}</span>
+        {savedTimeLabel ? <span className="last-saved">{savedTimeLabel}</span> : null}
       </div>
       <label
         className="autosave-switch"

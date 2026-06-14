@@ -82,14 +82,16 @@ describe('editorStoreState', () => {
         filePath: '/docs/a.md',
         markdown: '# A',
         html: '<h1>A</h1>',
-        isDirty: false
+        isDirty: false,
+        lastSavedAt: null
       },
       {
         id: 'tab-b',
         filePath: '/docs/b.md',
         markdown: '# B',
         html: '<h1>B</h1>',
-        isDirty: true
+        isDirty: true,
+        lastSavedAt: null
       }
     ]
 

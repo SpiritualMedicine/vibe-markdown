@@ -1,4 +1,5 @@
 export { EditorToolbar } from './chrome/EditorToolbar'
+export { RecoveryDraftBanner } from './chrome/RecoveryDraftBanner'
 export { EditorMarkdownPanel } from './editor/EditorMarkdownPanel'
 export { EditorPreviewPanel } from './editor/EditorPreviewPanel'
 export { EditorStatusBar } from './editor/EditorStatusBar'

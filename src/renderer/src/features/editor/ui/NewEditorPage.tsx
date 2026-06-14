@@ -6,7 +6,8 @@ import {
   EditorTabBar,
   EditorToolbar,
   FileExplorer,
-  OutlinePanel
+  OutlinePanel,
+  RecoveryDraftBanner
 } from '../components'
 import { t } from '../settings'
 import { useEditorStore } from '../../../state/editorStore'
@@ -72,6 +73,14 @@ export default function NewEditorPage(): React.JSX.Element {
         theme={state.ui.theme}
       />
 
+      <RecoveryDraftBanner
+        drafts={state.ui.recoveryDrafts}
+        locale={state.ui.locale}
+        onDiscardAll={() => void commands.discardAllRecoveryDrafts()}
+        onDiscardDraft={(draftId) => void commands.discardRecoveryDraft(draftId)}
+        onRestoreDraft={(draftId) => void commands.restoreRecoveryDraft(draftId)}
+      />
+
       <div className="editor-body" ref={bodyRef}>
         <FileExplorer
           className="explorer-sidebar"
@@ -124,6 +133,7 @@ export default function NewEditorPage(): React.JSX.Element {
 
           <EditorStatusBar
             autoSaveEnabled={state.ui.autoSaveEnabled}
+            lastSavedAt={activeTab?.lastSavedAt ?? null}
             locale={state.ui.locale}
             onToggleAutoSave={(enabled) => void commands.toggleAutoSave(enabled)}
             statusMessage={state.ui.status.message}

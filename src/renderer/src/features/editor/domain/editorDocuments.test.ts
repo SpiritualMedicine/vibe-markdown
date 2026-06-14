@@ -25,8 +25,22 @@ describe('editorDocuments', () => {
 
   it('returns the active tab or falls back to the first one', () => {
     const tabs = [
-      { id: 'a', filePath: null, markdown: 'one', html: '<p>one</p>', isDirty: false },
-      { id: 'b', filePath: null, markdown: 'two', html: '<p>two</p>', isDirty: true }
+      {
+        id: 'a',
+        filePath: null,
+        markdown: 'one',
+        html: '<p>one</p>',
+        isDirty: false,
+        lastSavedAt: null
+      },
+      {
+        id: 'b',
+        filePath: null,
+        markdown: 'two',
+        html: '<p>two</p>',
+        isDirty: true,
+        lastSavedAt: null
+      }
     ]
 
     expect(getActiveEditorTab(tabs, 'b')).toBe(tabs[1])

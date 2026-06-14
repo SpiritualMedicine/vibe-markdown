@@ -6,6 +6,7 @@ import type {
 } from '../../../../shared'
 import type { DesktopClient } from '../../infra/desktop/desktopClient'
 import type { EditorLocale, EditorThemeId, LocaleKey } from '../../features/editor/settings'
+import type { RecoveryDraft } from '../../features/editor/domain'
 
 export interface EditorStatus {
   tone: 'idle' | 'success' | 'error'
@@ -18,6 +19,7 @@ export interface EditorTab {
   markdown: string
   html: string
   isDirty: boolean
+  lastSavedAt: number | null
 }
 
 export interface EditorState {
@@ -44,6 +46,7 @@ export interface EditorState {
     showPreview: boolean
     theme: EditorThemeId
     status: EditorStatus
+    recoveryDrafts: RecoveryDraft[]
   }
 }
 
@@ -61,6 +64,7 @@ export type EditorAction =
   | { type: 'SET_THEME'; payload: EditorThemeId }
   | { type: 'SET_WINDOW_MAXIMIZED'; payload: boolean }
   | { type: 'SET_SHOW_PREVIEW'; payload: boolean }
+  | { type: 'SET_RECOVERY_DRAFTS'; payload: RecoveryDraft[] }
 
 export interface EditorCommandContext {
   desktop: DesktopClient

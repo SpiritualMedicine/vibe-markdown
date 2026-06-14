@@ -1,6 +1,7 @@
 import type { FileSaveResult, OpenByPathRequest } from '../../../../shared'
 import {
   createEditorTab,
+  type RecoveryDraft,
   getDocumentTemplate,
   getDocumentTemplateLabel,
   type DocumentTemplateId
@@ -28,7 +29,8 @@ async function saveSpecificTab(
     updateTab(ctx, tab.id, (current) => ({
       ...current,
       filePath: result.filePath,
-      isDirty: false
+      isDirty: false,
+      lastSavedAt: Date.now()
     }))
     await refreshRecentList(ctx)
   }
@@ -139,6 +141,46 @@ export async function saveAs(ctx: EditorCommandContext): Promise<void> {
   }
 
   setStatus(ctx, 'success', ctx.t('status.savedAs', { target: result.filePath ?? 'document' }))
+}
+
+function removeRecoveryDraft(ctx: EditorCommandContext, draftId: string): RecoveryDraft[] {
+  const nextDrafts = ctx.getState().ui.recoveryDrafts.filter((draft) => draft.id !== draftId)
+  ctx.dispatch({ type: 'SET_RECOVERY_DRAFTS', payload: nextDrafts })
+  return nextDrafts
+}
+
+export async function restoreRecoveryDraft(
+  ctx: EditorCommandContext,
+  draftId: string
+): Promise<void> {
+  const draft = ctx.getState().ui.recoveryDrafts.find((item) => item.id === draftId)
+  if (!draft) {
+    return
+  }
+
+  const nextTab: EditorTab = {
+    ...createEditorTab(ctx.markdownToHtml, draft.markdown),
+    id: `recovered-${draft.id}`,
+    filePath: draft.filePath,
+    isDirty: true,
+    lastSavedAt: null
+  }
+  setTabs(ctx, [...ctx.getState().tabs, nextTab], nextTab.id)
+  removeRecoveryDraft(ctx, draftId)
+  setStatus(ctx, 'success', ctx.t('status.recoveryRestored'))
+}
+
+export async function discardRecoveryDraft(
+  ctx: EditorCommandContext,
+  draftId: string
+): Promise<void> {
+  removeRecoveryDraft(ctx, draftId)
+  setStatus(ctx, 'idle', ctx.t('status.recoveryDiscarded'))
+}
+
+export async function discardAllRecoveryDrafts(ctx: EditorCommandContext): Promise<void> {
+  ctx.dispatch({ type: 'SET_RECOVERY_DRAFTS', payload: [] })
+  setStatus(ctx, 'idle', ctx.t('status.recoveryDiscarded'))
 }
 
 export async function exportHtml(ctx: EditorCommandContext): Promise<void> {

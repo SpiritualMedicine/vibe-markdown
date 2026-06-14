@@ -19,7 +19,8 @@ export async function useUserTemplate(
     markdown: template.markdown,
     html: ctx.markdownToHtml(template.markdown),
     isDirty: true,
-    filePath: null
+    filePath: null,
+    lastSavedAt: null
   }
 
   ctx.dispatch({ type: 'SET_TABS', payload: [nextTab] })
